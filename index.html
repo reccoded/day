@@ -470,9 +470,28 @@ button{cursor:pointer}
 .schedule-add .plus-btn{width:44px;border-radius:0}
 .schedule-date{flex:none;font-size:12px;color:var(--muted);min-width:44px}
 @media(max-width:520px){
-  .schedule-add{grid-template-columns:126px minmax(0,1fr) 42px}
-  .schedule-add input{padding:10px 9px}
-  .schedule-add .plus-btn{width:42px}
+  .schedule-add{
+    grid-template-columns:minmax(142px,44%) minmax(0,1fr) 42px;
+  }
+  .schedule-add input{
+    padding:10px 9px;
+  }
+  .schedule-add #scheduleDate{
+    width:100%;
+    min-width:0;
+    padding-left:8px;
+    padding-right:6px;
+    font-size:14px;
+  }
+  .schedule-add #scheduleInput{
+    width:100%;
+    min-width:0;
+    padding-left:10px;
+    padding-right:8px;
+  }
+  .schedule-add .plus-btn{
+    width:42px;
+  }
 }
 
 
