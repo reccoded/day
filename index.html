@@ -1,0 +1,2827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f2ec">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DAY">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<title>DAY</title>
+
+<style>
+:root{
+  --bg:#f4f2ec;
+  --surface:#fbfaf7;
+  --surface2:#eeece5;
+  --line:#dedbd2;
+  --text:#292a27;
+  --muted:#85857e;
+  --accent:#81927b;
+  --accent-soft:#e1e7dd;
+  --danger:#a5655f;
+  --shadow:0 5px 20px rgba(45,45,38,.06);
+  --radius:15px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
+button,input,textarea{font:inherit}
+button{color:inherit}
+body{padding-bottom:env(safe-area-inset-bottom)}
+
+.topbar{
+  position:sticky;top:0;z-index:100;
+  height:58px;
+  display:flex;align-items:center;
+  background:rgba(244,242,236,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:0 14px;
+}
+.nav{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  height:100%;
+}
+.nav button{
+  border:0;background:none;
+  font-size:14px;font-weight:600;
+  color:var(--muted);
+  padding:0 2px;
+  position:relative;
+}
+.nav button.active{color:var(--text)}
+.nav button.active:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:3px;
+  border-radius:3px 3px 0 0;
+  background:var(--accent);
+}
+.icon-btn{
+  border:0;background:none;
+  width:38px;height:38px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:19px;
+}
+.icon-btn:hover{background:var(--surface2)}
+
+main{
+  width:min(100%,760px);
+  margin:0 auto;
+  padding:18px 14px 70px;
+}
+
+.view{display:none}
+.view.active{display:block}
+
+button{cursor:pointer}
+
+.soft-btn{
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:10px;
+  padding:9px 13px;
+}
+.soft-btn:active{transform:scale(.98)}
+
+.primary-btn{
+  border:0;
+  background:var(--accent);
+  color:white;
+  border-radius:10px;
+  padding:10px 14px;
+}
+
+.danger-btn{
+  border:1px solid #d9bbb7;
+  color:var(--danger);
+  background:transparent;
+  border-radius:10px;
+  padding:9px 13px;
+}
+
+.small{font-size:12px;color:var(--muted)}
+.hidden{display:none!important}
+
+/* DAY */
+
+.day-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:13px;
+}
+.date-nav{
+  display:flex;align-items:center;gap:5px;
+}
+.date-button{
+  border:0;background:none;
+  font-size:17px;font-weight:650;
+  padding:8px 7px;
+}
+.arrow{
+  border:0;background:none;
+  font-size:22px;
+  color:var(--muted);
+  padding:5px 8px;
+}
+
+.diary-text{
+  width:100%;
+  min-height:55vh;
+  resize:vertical;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:17px;
+  outline:none;
+  line-height:1.75;
+  font-size:16px;
+  box-shadow:var(--shadow);
+}
+.diary-text:focus{border-color:#bdc7b8}
+
+.tag-input{
+  width:100%;
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface);
+  padding:12px 14px;
+  outline:none;
+}
+.save-state{
+  min-height:22px;
+  padding:6px 3px 0;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.search-panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:15px;
+}
+.segment{
+  display:flex;
+  padding:3px;
+  background:var(--surface2);
+  border-radius:10px;
+  gap:3px;
+}
+.segment button{
+  flex:1;
+  border:0;background:transparent;
+  padding:8px;
+  border-radius:8px;
+  color:var(--muted);
+}
+.segment button.active{
+  background:var(--surface);
+  color:var(--text);
+  box-shadow:0 1px 5px rgba(0,0,0,.06);
+}
+.search-input{
+  width:100%;
+  margin-top:10px;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  outline:none;
+}
+.search-result{
+  padding:12px 3px;
+  border-bottom:1px solid var(--line);
+  cursor:pointer;
+}
+.search-result-date{font-weight:650;margin-bottom:4px}
+.search-preview{
+  font-size:14px;
+  color:#55564f;
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+.tagline{font-size:12px;color:var(--accent);margin-top:5px}
+
+/* PLAN */
+
+.plan-tabs{
+  display:flex;
+  width:210px;
+  margin:0 auto 18px;
+  padding:3px;
+  border-radius:11px;
+  background:var(--surface2);
+}
+.plan-tabs button{
+  flex:1;border:0;background:transparent;
+  padding:8px;border-radius:8px;
+  color:var(--muted);
+}
+.plan-tabs button.active{
+  background:var(--surface);
+  color:var(--text);
+  font-weight:650;
+}
+
+.chip-create{
+  display:flex;
+  gap:7px;
+  margin-bottom:11px;
+}
+.chip-create input{
+  flex:1;min-width:0;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:11px;
+  padding:11px 13px;
+  outline:none;
+}
+.plus-btn{
+  width:44px;
+  border:0;
+  border-radius:11px;
+  background:var(--accent);
+  color:#fff;
+  font-size:20px;
+}
+
+.loose-area{
+  min-height:55px;
+  display:flex;
+  flex-wrap:wrap;
+  align-content:flex-start;
+  gap:7px;
+  padding:8px 3px 14px;
+}
+
+.chip{
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  padding:8px 11px;
+  border-radius:999px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 2px 7px rgba(40,40,30,.04);
+  font-size:14px;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+.chip.done{
+  opacity:.28;
+}
+.chip.dragging{opacity:.45}
+
+.weekday-board{
+  display:grid;
+  gap:8px;
+}
+.day-row,.week-row{
+  background:rgba(251,250,247,.55);
+  border:1px solid var(--line);
+  border-radius:13px;
+  min-height:65px;
+  padding:10px;
+}
+.day-label{
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.day-row.saturday .day-label{color:#55769b}
+.day-row.sunday .day-label{color:#b2645f}
+.day-row.anyweek{background:var(--accent-soft);border-color:#c7d0c2}
+.day-row.anyweek .day-label{color:#667f61}
+.drop-zone{
+  min-height:32px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-content:flex-start;
+}
+.drop-hover{outline:2px solid #aebca8}
+
+.week-row.current{
+  background:var(--accent-soft);
+  border-color:#c7d0c2;
+}
+.week-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:9px;
+}
+.week-number{
+  font-size:11px;
+  font-weight:500;
+  color:var(--muted);
+  margin-left:auto;
+}
+.week-dates{
+  font-size:15px;
+  font-weight:750;
+  color:var(--text);
+}
+.week-minus{
+  margin-left:auto;
+  border:0;background:transparent;
+  font-size:20px;color:var(--muted);
+  padding:2px 7px;
+}
+.week-add-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px;
+}
+.add-week{
+  width:100%;
+  border:1px dashed #c9c6bc;
+  background:transparent;
+  border-radius:12px;
+  padding:10px;
+  margin-top:0;
+  color:var(--muted);
+  font-size:13px;
+}
+.plan-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:20px;
+}
+
+/* TODO */
+
+.todo-section{
+  margin-bottom:24px;
+}
+.section-title{
+  font-size:14px;
+  letter-spacing:.04em;
+  font-weight:750;
+  margin:0 0 9px 2px;
+}
+.todo-add{
+  display:flex;gap:7px;margin-bottom:9px;
+}
+.todo-add input{
+  flex:1;min-width:0;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:11px;
+  padding:11px 13px;
+  outline:none;
+}
+.todo-list{
+  min-height:40px;
+}
+.todo-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  min-height:48px;
+  padding:7px 8px;
+}
+.todo-item:first-child{border-radius:11px 11px 0 0}
+.todo-item:last-child{border-radius:0 0 11px 11px;border-bottom:0}
+.todo-item:only-child{border-radius:11px}
+.check{
+  width:21px;height:21px;
+  border:1.5px solid #aaa99f;
+  border-radius:6px;
+  background:transparent;
+  flex:none;
+}
+.todo-title{
+  flex:1;
+  line-height:1.4;
+  word-break:break-word;
+  cursor:text;
+}
+.todo-title-edit{
+  flex:1;
+  min-width:0;
+  width:100%;
+  border:1px solid #bdc7b8;
+  background:var(--bg);
+  border-radius:8px;
+  padding:7px 9px;
+  outline:none;
+  line-height:1.4;
+}
+.drag-handle{
+  padding:8px 5px;
+  color:#aaa99f;
+  cursor:grab;
+  touch-action:none;
+  font-size:18px;
+}
+.delete-mini{
+  border:0;background:none;
+  color:#aaa;
+  padding:7px;
+}
+
+.completed-toggle{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  border:0;
+  border-top:1px solid var(--line);
+  background:none;
+  padding:15px 3px;
+  font-weight:650;
+}
+.completed-group{margin:12px 0 20px}
+.completed-date{
+  font-size:12px;color:var(--muted);
+  margin:14px 0 5px;
+}
+.completed-item{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:9px 4px;
+  border-bottom:1px solid var(--line);
+}
+.completed-title{flex:1}
+.completed-actions button{
+  border:0;background:none;
+  font-size:12px;
+  color:var(--muted);
+  padding:5px;
+}
+.schedule-add{
+  display:grid;grid-template-columns:148px 1fr 44px;gap:0;margin-bottom:9px;
+  border:1px solid var(--line);border-radius:11px;background:var(--surface);overflow:hidden;
+}
+.schedule-add input{min-width:0;border:0;background:transparent;border-radius:0;padding:11px 13px;outline:none}
+.schedule-add #scheduleDate{border-right:1px solid var(--line);color:var(--muted)}
+.schedule-add .plus-btn{width:44px;border-radius:0}
+.schedule-date{flex:none;font-size:12px;color:var(--muted);min-width:44px}
+@media(max-width:520px){
+  .schedule-add{
+    grid-template-columns:minmax(142px,44%) minmax(0,1fr) 42px;
+  }
+  .schedule-add input{
+    padding:10px 9px;
+  }
+  .schedule-add #scheduleDate{
+    width:100%;
+    min-width:0;
+    padding-left:8px;
+    padding-right:6px;
+    font-size:14px;
+  }
+  .schedule-add #scheduleInput{
+    width:100%;
+    min-width:0;
+    padding-left:10px;
+    padding-right:8px;
+  }
+  .schedule-add .plus-btn{
+    width:42px;
+  }
+}
+
+
+
+
+
+@media(max-width:520px){
+  .schedule-add{
+    grid-template-columns:124px minmax(0,1fr) 42px;
+    gap:6px;
+  }
+  .schedule-add #scheduleDate{
+    box-sizing:border-box;
+    width:124px;
+    min-width:124px;
+    padding:10px 5px;
+    font-size:13px;
+    letter-spacing:-0.2px;
+    color:var(--text);
+    color-scheme:light;
+    -webkit-appearance:none;
+    appearance:none;
+    background:transparent;
+    border-right:1px solid var(--line);
+  }
+  .schedule-add #scheduleDate::-webkit-calendar-picker-indicator{
+    display:none !important;
+    -webkit-appearance:none;
+    opacity:0 !important;
+    width:0 !important;
+    height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+  .schedule-add #scheduleInput{
+    min-width:0;
+    padding-left:7px;
+    padding-right:6px;
+  }
+}
+
+/* PLAN layout refinements */
+.chip-create .plan-trash{
+  width:44px;min-width:44px;padding:0;
+  border:0;border-radius:11px;
+  background:var(--danger);color:#fff;
+  font-size:24px;font-weight:500;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+}
+.plan-trash.drop-hover{filter:brightness(.9);outline:3px solid rgba(165,101,95,.20)}
+.day-row{
+  display:grid;grid-template-columns:42px minmax(0,1fr);align-items:stretch;gap:8px;
+  min-height:82px;
+}
+.day-label{margin:0;display:flex;align-items:center;justify-content:center;min-height:60px}
+.day-row .drop-zone{min-height:60px;align-content:flex-start}
+.week-row{
+  display:grid;grid-template-columns:48px minmax(0,1fr) 30px;align-items:stretch;gap:5px;min-height:82px;
+}
+.week-head{display:contents;margin:0}
+.week-dates{
+  display:inline-flex;align-self:center;justify-self:start;
+  align-items:center;justify-content:center;text-align:center;
+  font-size:13px;line-height:1.65;white-space:pre-line;
+  position:relative;padding:0;
+}
+.week-dates::after{
+  content:"";position:absolute;left:0;right:0;top:50%;
+  height:1px;background:var(--line);transform:translateY(-50%);
+}
+.week-number{display:none}
+.week-minus{grid-column:3;grid-row:1;align-self:center;margin:0}
+.week-row>.drop-zone{grid-column:2;grid-row:1;min-height:60px;align-content:flex-start}
+.diary-tag-row{display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.quick-tags{display:flex;gap:6px;flex-wrap:wrap}
+.quick-tag{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 10px;font-size:13px;color:var(--muted)}
+.quick-tag.active{background:var(--accent-soft);border-color:#bdc9b7;color:#53664f;font-weight:700}
+.diary-tag-row .tag-input{flex:1;min-width:150px;width:auto;margin-top:0}
+@media(max-width:520px){
+  .chip-create .plan-trash{min-width:42px;width:42px;padding:0;font-size:23px}
+  .day-row{grid-template-columns:38px minmax(0,1fr);min-height:82px}
+  .week-row{grid-template-columns:48px minmax(0,1fr) 28px;min-height:82px}
+  .week-dates{font-size:12px}
+  .diary-tag-row{align-items:stretch}
+  .quick-tags{width:100%}
+  .diary-tag-row .tag-input{width:100%;flex-basis:100%}
+}
+
+
+.tag-preset-list{display:flex;flex-direction:column;gap:7px}
+.tag-preset-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center}
+.tag-preset-item input,.tag-preset-add input{min-width:0;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 10px;outline:none}
+.tag-preset-actions{display:flex;gap:5px}
+.tag-preset-actions button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font-size:12px}
+.tag-preset-actions .preset-delete{color:var(--danger);border-color:#d9bbb7}
+.tag-preset-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:10px}
+
+
+/* ANNUAL */
+.annual-wrap{width:100%}
+.annual-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.annual-year-nav{display:flex;align-items:center;gap:6px}
+.annual-year{font-size:20px;font-weight:750;min-width:76px;text-align:center}
+.annual-add{white-space:nowrap}
+.annual-empty{padding:42px 12px;text-align:center;color:var(--muted)}
+.annual-desktop{display:block;overflow-x:auto;padding-bottom:8px}
+.annual-grid{min-width:1050px;background:transparent}
+.annual-month-head,.annual-project-row{display:grid;grid-template-columns:150px minmax(900px,1fr)}
+.annual-project-name{padding:10px 14px 10px 2px;font-weight:750;display:flex;align-items:center;background:transparent}
+.annual-months{display:grid;grid-template-columns:repeat(12,1fr);height:38px}
+.annual-month{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);font-weight:700}
+.annual-month.current{color:#53664f;font-weight:750;background:rgba(225,231,221,.55);border-radius:8px 8px 0 0}
+.annual-project-row{min-height:58px}
+.annual-track{position:relative;min-height:58px}
+.annual-month-band{position:absolute;top:0;bottom:0;border-left:1px solid rgba(126,125,116,.11);pointer-events:none}
+.annual-month-band.current{background:rgba(225,231,221,.38)}
+.annual-month-band:last-of-type{border-right:1px solid rgba(126,125,116,.08)}
+.annual-bar{position:absolute;top:12px;height:34px;border:0;border-radius:9px;padding:0 9px;font-size:12px;line-height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:700;min-width:5px;text-align:center;display:flex;align-items:center;justify-content:center}
+.annual-bar:hover{filter:brightness(.97)}
+.annual-bar.short{padding:0;min-width:8px}
+.annual-dot{position:absolute;top:23px;width:12px;height:12px;border:0;border-radius:50%;transform:translateX(-50%);cursor:pointer;box-shadow:0 0 0 3px var(--bg)}
+.annual-dot:hover{transform:translateX(-50%) scale(1.15)}
+.annual-mobile{display:none}
+.annual-month-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px;min-height:112px;overflow:hidden}
+.annual-month-card.current{background:var(--accent-soft);border-color:#c7d0c2}
+.annual-month-title{font-size:13px;font-weight:800;margin-bottom:7px}
+.annual-card-item{font-size:10.5px;line-height:1.25;padding:5px 6px;border:0;border-radius:7px;cursor:pointer;margin-top:5px;overflow:hidden}
+.annual-card-project{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.annual-card-meta{font-size:9.5px;margin-top:2px;text-align:center;font-weight:700;opacity:.9}
+.annual-form{display:grid;gap:11px}.annual-form label{font-size:12px;color:var(--muted);display:grid;gap:5px}.annual-form input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:10px;outline:none}.annual-form input[type="color"]{height:42px;padding:4px;cursor:pointer}.annual-form-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}.annual-edit-actions{display:flex;justify-content:space-between;gap:8px;margin-top:5px}.annual-edit-actions-right{display:flex;gap:7px}
+@media(max-width:699px){
+  .annual-desktop{display:none}
+  .annual-mobile{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(4,minmax(0,1fr));
+    gap:7px;
+    height:calc(100dvh - 188px);
+    min-height:470px;
+    max-height:620px;
+  }
+  .annual-head{margin-bottom:12px}
+  .annual-year{font-size:18px}
+  .annual-add{padding:9px 11px}
+  .annual-month-card{padding:8px;min-height:0}
+  .annual-form-dates{grid-template-columns:1fr}
+}
+@media(min-width:900px){
+  main{width:min(96vw,1380px);padding-left:24px;padding-right:24px}
+  #dayView,#todoView,#planView{max-width:1180px;margin:0 auto}
+  #todoView{display:none}
+  #todoView.active{display:block}
+  #todoView .todo-section{min-width:0}
+  #todoView .todo-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:12px;
+    row-gap:8px;
+  }
+  #todoView .todo-list .todo-item{
+    border-radius:11px!important;
+    border:1px solid #e4ded1;
+    background:#f3eee4;
+    margin:0;
+    min-width:0;
+  }
+  #planView .weekday-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #planView #weekRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #planView .week-row{margin:0}
+  #planView .plan-trash{
+    line-height:0;
+    padding-bottom:3px;
+  }
+  #annualView{max-width:none}
+  .nav{gap:42px}
+}
+
+/* SETTINGS */
+
+.modal-bg{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(30,30,25,.25);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+.settings{
+  width:min(100%,620px);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--bg);
+  border-radius:22px 22px 0 0;
+  padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.modal-head{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+.modal-head h2{font-size:18px;margin:0}
+.settings-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:11px;
+}
+.settings-card h3{
+  font-size:14px;margin:0 0 12px;
+}
+.stat{
+  display:flex;justify-content:space-between;
+  padding:6px 0;font-size:14px;
+}
+.setting-buttons{
+  display:flex;flex-wrap:wrap;gap:7px;
+}
+.export-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin:8px 0;
+}
+.export-row input{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--bg);
+  border-radius:9px;
+  padding:9px;
+}
+.danger-zone{
+  margin-top:24px;
+  padding-top:15px;
+  border-top:1px solid #dcc9c5;
+}
+
+/* dialog */
+
+.dialog-bg{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(30,30,25,.35);
+  padding:20px;
+}
+.dialog{
+  width:min(100%,360px);
+  background:var(--surface);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 15px 50px rgba(0,0,0,.15);
+}
+.dialog-text{
+  line-height:1.6;
+  margin-bottom:17px;
+}
+.dialog-actions{
+  display:flex;justify-content:flex-end;gap:7px;
+}
+
+@media(min-width:700px){
+  main{padding-top:28px}
+  .weekday-board{grid-template-columns:1fr 1fr}
+  .settings{
+    align-self:center;
+    border-radius:20px;
+  }
+}
+
+@media(max-width:699px){
+  .day-row.drop-hover,
+  .week-row.drop-hover,
+  .loose-area.drop-hover{
+    outline:2px solid var(--accent);
+    outline-offset:-2px;
+  }
+}
+
+
+/* MOBILE PLAN REFINEMENT */
+@media(max-width:699px){
+  /* Weekday: empty/one-chip rows stay compact so Mon-Sun fit at a glance. */
+  .day-row{min-height:48px;padding:7px 9px;align-items:center}
+  .day-label{min-height:32px}
+  .day-row .drop-zone{min-height:32px;align-items:center;align-content:center}
+  .day-row:has(.drop-zone .chip:nth-child(2)){min-height:65px;align-items:stretch}
+  .day-row:has(.drop-zone .chip:nth-child(2)) .day-label,
+  .day-row:has(.drop-zone .chip:nth-child(2)) .drop-zone{
+    min-height:49px;align-content:flex-start
+  }
+
+  /* Weekly remains a fixed two-line card. */
+  .week-row{min-height:82px}
+  .week-row>.drop-zone{min-height:60px;align-items:flex-start;align-content:flex-start}
+
+  /* Every PLAN chip has the same height. */
+  .chip{height:34px;min-height:34px;padding:6px 11px;line-height:20px;flex:none}
+  .chip>span{line-height:20px;white-space:nowrap}
+
+  /* Inner drop-zone never becomes a second highlighted target on mobile. */
+  .day-row .drop-zone.drop-hover,
+  .week-row .drop-zone.drop-hover{outline:none}
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <nav class="nav">
+    <button data-main="day">DAY</button>
+    <button data-main="plan" class="active">PLAN</button>
+    <button data-main="todo">TODO</button>
+    <button data-main="annual">YEAR</button>
+  </nav>
+  <button class="icon-btn" id="settingsBtn" aria-label="설정">⚙</button>
+</header>
+
+<main>
+
+<!-- DAY -->
+<section id="dayView" class="view">
+  <div class="day-header">
+    <div class="date-nav" id="dayDateNav">
+      <button class="arrow" id="prevDay">‹</button>
+      <button class="date-button" id="dateButton"></button>
+      <button class="arrow" id="nextDay">›</button>
+      <input id="datePicker" type="date" class="hidden">
+    </div>
+    <div>
+      <button class="icon-btn" id="searchToggle">⌕</button>
+      <button class="icon-btn" id="deleteDiary">⋮</button>
+    </div>
+  </div>
+
+  <div id="searchPanel" class="search-panel hidden">
+    <div class="segment">
+      <button id="searchContentBtn" class="active">내용</button>
+      <button id="searchTagBtn">태그</button>
+    </div>
+    <input class="search-input" id="searchInput" placeholder="검색">
+    <div id="searchResults"></div>
+  </div>
+
+  <div id="diaryEditor">
+    <textarea id="diaryText" class="diary-text"
+      placeholder="오늘의 기록을 남겨보세요."></textarea>
+
+    <div class="diary-tag-row">
+      <div class="quick-tags" id="quickTags">
+        <button type="button" class="quick-tag" data-tag="일상">일상</button>
+        <button type="button" class="quick-tag" data-tag="일정">일정</button>
+        <button type="button" class="quick-tag" data-tag="업무">업무</button>
+        <button type="button" class="quick-tag" data-tag="특별">특별</button>
+        <button type="button" class="quick-tag" data-tag="생각">생각</button>
+      </div>
+      <input id="tagInput" class="tag-input" placeholder="태그 입력">
+    </div>
+
+    <div id="saveState" class="save-state"></div>
+  </div>
+</section>
+
+<!-- PLAN -->
+<section id="planView" class="view active">
+
+  <div class="plan-tabs">
+    <button id="weekdayTab" class="active">요일</button>
+    <button id="weeklyTab">주간</button>
+  </div>
+
+  <!-- WEEKDAY -->
+  <div id="weekdayPlan">
+    <div class="chip-create">
+      <input id="weekdayChipInput" placeholder="할 일">
+      <button class="plus-btn" id="weekdayChipAdd">＋</button>
+       <button class="plan-trash" id="weekdayTrash" aria-label="삭제">−</button>
+    </div>
+
+    <div class="loose-area drop-zone"
+      id="weekdayLoose" data-zone="loose"></div>
+
+    <div class="weekday-board" id="weekdayBoard"></div>
+
+    <div class="plan-actions">
+      <button class="soft-btn" id="weekdayDoneDelete">완료 삭제</button>
+      <button class="danger-btn" id="weekdayAllDelete">전체 삭제</button>
+    </div>
+  </div>
+
+  <!-- WEEKLY -->
+  <div id="weeklyPlan" class="hidden">
+    <div class="chip-create">
+      <input id="weeklyChipInput" placeholder="할 일">
+      <button class="plus-btn" id="weeklyChipAdd">＋</button>
+       <button class="plan-trash" id="weeklyTrash" aria-label="삭제">−</button>
+    </div>
+
+    <div class="loose-area drop-zone"
+      id="weeklyLoose" data-zone="loose"></div>
+
+    <div id="weekRows"></div>
+    <div class="week-add-actions">
+      <button class="add-week" id="addPrevWeek">＋ 이전 주</button>
+      <button class="add-week" id="addNextWeek">다음 주 ＋</button>
+    </div>
+
+    <div class="plan-actions">
+      <button class="soft-btn" id="weeklyDoneDelete">완료 삭제</button>
+      <button class="danger-btn" id="weeklyAllDelete">전체 삭제</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ANNUAL -->
+<section id="annualView" class="view">
+  <div class="annual-wrap">
+    <div class="annual-head">
+      <div class="annual-year-nav">
+        <button class="arrow" id="annualPrevYear">‹</button>
+        <div class="annual-year" id="annualYear"></div>
+        <button class="arrow" id="annualNextYear">›</button>
+      </div>
+      <button class="primary-btn annual-add" id="annualAdd">＋ 추가</button>
+    </div>
+    <div id="annualDesktop" class="annual-desktop"></div>
+    <div id="annualMobile" class="annual-mobile"></div>
+  </div>
+</section>
+
+<!-- TODO -->
+<section id="todoView" class="view">
+
+  <div class="todo-section">
+    <div class="section-title">Todo</div>
+    <div class="todo-add">
+      <input id="todoInput" placeholder="할 일">
+      <button class="plus-btn" id="todoAdd">＋</button>
+    </div>
+    <div id="todoList" class="todo-list" data-list="todo"></div>
+  </div>
+
+  <div class="todo-section">
+    <div class="section-title">Schedule</div>
+    <div class="schedule-add">
+      <input id="scheduleDate" type="date">
+      <input id="scheduleInput" placeholder="일정">
+      <button class="plus-btn" id="scheduleAdd">＋</button>
+    </div>
+    <div id="scheduleList" class="todo-list" data-list="schedule"></div>
+  </div>
+
+  <div class="todo-section">
+    <div class="section-title">Someday</div>
+    <div class="todo-add">
+      <input id="somedayInput" placeholder="언젠가 할 일">
+      <button class="plus-btn" id="somedayAdd">＋</button>
+    </div>
+    <div id="somedayList" class="todo-list" data-list="someday"></div>
+  </div>
+
+  <button class="completed-toggle" id="completedToggle">
+    <span>완료 <span id="completedCount">0(0)</span></span>
+    <span id="completedArrow">⌄</span>
+  </button>
+
+  <div id="completedList" class="hidden"></div>
+</section>
+
+</main>
+
+<!-- SETTINGS -->
+<div id="settingsModal" class="modal-bg hidden">
+  <div class="settings">
+    <div class="modal-head">
+      <h2>설정</h2>
+      <button class="icon-btn" id="settingsClose">×</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>데이터 현황</h3>
+      <div class="stat"><span>전체 일기</span><b id="statDiaryAll">0</b></div>
+      <div class="stat"><span>올해 일기</span><b id="statDiaryYear">0</b></div>
+      <div class="stat"><span>전체 TODO</span><b id="statTodoAll">0</b></div>
+      <div class="stat"><span>올해 TODO</span><b id="statTodoYear">0</b></div>
+    </div>
+
+    <div class="settings-card">
+      <h3>태그 프리셋</h3>
+      <div id="tagPresetList" class="tag-preset-list"></div>
+      <div class="tag-preset-add">
+        <input id="tagPresetInput" placeholder="새 태그">
+        <button class="primary-btn" id="tagPresetAdd">추가</button>
+      </div>
+      <div class="small" style="margin-top:8px">수정·삭제하면 기존 일기의 같은 태그에도 적용됩니다.</div>
+    </div>
+
+    <div class="settings-card">
+      <h3>전체 데이터</h3>
+      <div class="setting-buttons">
+        <button class="soft-btn" id="jsonBackup">JSON 백업</button>
+        <button class="soft-btn" id="jsonRestoreBtn">JSON 복원</button>
+        <input type="file" accept=".json,application/json"
+          id="jsonRestoreInput" class="hidden">
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>DAY MD 내보내기</h3>
+      <div class="export-row">
+        <input type="date" id="diaryExportFrom">
+        <input type="date" id="diaryExportTo">
+      </div>
+      <button class="soft-btn" id="diaryExport">MD 내보내기</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>TODO 완료 MD 내보내기</h3>
+      <div class="export-row">
+        <input type="date" id="todoExportFrom">
+        <input type="date" id="todoExportTo">
+      </div>
+      <button class="soft-btn" id="todoExport">MD 내보내기</button>
+    </div>
+
+    <div class="danger-zone">
+      <button class="danger-btn" id="resetAll">전체 초기화</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="annualModal" class="dialog-bg hidden">
+  <div class="dialog">
+    <div class="modal-head"><h2 id="annualModalTitle">구간 추가</h2><button class="icon-btn" id="annualClose">×</button></div>
+    <div class="annual-form">
+      <label>제목<input id="annualProject" maxlength="40" placeholder="제목을 입력하세요"></label>
+      <label>색상<input id="annualColor" type="color" value="#c98f86"></label>
+      <label>단계 메모<input id="annualLabel" maxlength="50" placeholder="단계 및 메모를 입력하세요"></label>
+      <div class="annual-form-dates">
+        <label>시작일<input id="annualStart" type="date"></label>
+        <label>종료일<input id="annualEnd" type="date"></label>
+      </div>
+      <div class="annual-edit-actions">
+        <button class="danger-btn hidden" id="annualDelete">삭제</button>
+        <div class="annual-edit-actions-right"><button class="soft-btn" id="annualCancel">취소</button><button class="primary-btn" id="annualSave">저장</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="chipMenu" class="chip-menu hidden"><button id="chipDeleteAction">삭제</button></div>
+
+<div id="dialogBg" class="dialog-bg hidden">
+  <div class="dialog">
+    <div class="dialog-text" id="dialogText"></div>
+    <div class="dialog-actions">
+      <button class="soft-btn" id="dialogCancel">취소</button>
+      <button class="danger-btn" id="dialogOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATABASE
+========================================================= */
+
+const DB_NAME = "DAY_APP_DB";
+const DB_VERSION = 1;
+const STORE = "app";
+
+let db;
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
+
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains(STORE)){
+        d.createObjectStore(STORE);
+      }
+    };
+
+    req.onsuccess=e=>{
+      db=e.target.result;
+      resolve();
+    };
+
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+function dbGet(key){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readonly");
+    const req=tx.objectStore(STORE).get(key);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+function dbSet(key,value){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).put(value,key);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+const defaultData={
+  version:1,
+  diaries:{},
+  tagPresets:["일상","일정","업무","특별","생각"],
+
+  plan:{
+    weekday:{
+      chips:[],
+    },
+    weekly:{
+      chips:[],
+      weeks:[]
+    }
+  },
+
+  annual:{segments:[],colors:{}},
+
+  todo:{
+    todo:[],
+    schedule:[],
+    someday:[],
+    completed:[]
+  }
+};
+
+let data=structuredClone(defaultData);
+
+/* =========================================================
+   DATE UTILITIES
+========================================================= */
+
+function pad(n){return String(n).padStart(2,"0")}
+
+function localDateString(date=new Date()){
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+}
+
+function parseDate(s){
+  const [y,m,d]=s.split("-").map(Number);
+  return new Date(y,m-1,d,12,0,0);
+}
+
+function addDays(date,n){
+  const d=new Date(date);
+  d.setDate(d.getDate()+n);
+  return d;
+}
+
+function formatKoreanDate(s){
+  const d=parseDate(s);
+  return `${d.getFullYear()}. ${pad(d.getMonth()+1)}. ${pad(d.getDate())}`;
+}
+
+function shortDate(d){
+  return `${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+}
+
+/* ISO WEEK */
+
+function isoWeekInfo(date){
+  const d=new Date(Date.UTC(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  ));
+
+  const day=d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate()+4-day);
+
+  const isoYear=d.getUTCFullYear();
+  const yearStart=new Date(Date.UTC(isoYear,0,1));
+
+  const week=Math.ceil((((d-yearStart)/86400000)+1)/7);
+
+  const jan4=new Date(isoYear,0,4);
+  const jan4Day=jan4.getDay() || 7;
+  const firstMonday=addDays(jan4,1-jan4Day);
+
+  const monday=addDays(firstMonday,(week-1)*7);
+  const sunday=addDays(monday,6);
+
+  const dec28=new Date(isoYear,11,28);
+  const totalWeeks=isoWeekNumberOnly(dec28);
+
+  return {isoYear,week,totalWeeks,monday,sunday};
+}
+
+function isoWeekNumberOnly(date){
+  const d=new Date(Date.UTC(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  ));
+  const day=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()+4-day);
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+
+function weekKey(info){
+  return `${info.isoYear}-W${pad(info.week)}`;
+}
+
+function infoFromWeekKey(key){
+  const m=key.match(/^(\d+)-W(\d+)$/);
+  if(!m)return null;
+
+  const year=Number(m[1]);
+  const week=Number(m[2]);
+
+  const jan4=new Date(year,0,4,12);
+  const day=jan4.getDay()||7;
+  const firstMonday=addDays(jan4,1-day);
+  const monday=addDays(firstMonday,(week-1)*7);
+
+  return isoWeekInfo(monday);
+}
+
+function nextWeekKey(key){
+  const info=infoFromWeekKey(key);
+  return weekKey(isoWeekInfo(addDays(info.monday,7)));
+}
+
+function prevWeekKey(key){
+  const info=infoFromWeekKey(key);
+  return weekKey(isoWeekInfo(addDays(info.monday,-7)));
+}
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+function uid(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+
+async function saveAll(){
+  await dbSet("data",data);
+}
+
+function downloadText(filename,text,type="text/plain"){
+  const blob=new Blob([text],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+let confirmResolve=null;
+
+function confirmBox(text){
+  document.getElementById("dialogText").textContent=text;
+  document.getElementById("dialogBg").classList.remove("hidden");
+
+  return new Promise(resolve=>{
+    confirmResolve=resolve;
+  });
+}
+
+document.getElementById("dialogCancel").onclick=()=>{
+  document.getElementById("dialogBg").classList.add("hidden");
+  confirmResolve?.(false);
+  confirmResolve=null;
+};
+
+document.getElementById("dialogOk").onclick=()=>{
+  document.getElementById("dialogBg").classList.add("hidden");
+  confirmResolve?.(true);
+  confirmResolve=null;
+};
+
+/* =========================================================
+   MAIN NAV
+========================================================= */
+
+document.querySelectorAll("[data-main]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-main]")
+      .forEach(b=>b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    document.querySelectorAll(".view")
+      .forEach(v=>v.classList.remove("active"));
+
+    document.getElementById(btn.dataset.main+"View")
+      .classList.add("active");
+
+    if(btn.dataset.main==="todo") renderTodo();
+    if(btn.dataset.main==="plan") renderPlan();
+    if(btn.dataset.main==="annual") renderAnnual();
+  };
+});
+
+/* =========================================================
+   DAY
+========================================================= */
+
+let selectedDate=localDateString();
+let diaryTimer=null;
+let searchMode="content";
+
+const diaryText=document.getElementById("diaryText");
+const tagInput=document.getElementById("tagInput");
+const DEFAULT_TAG_PRESETS=["일상","일정","업무","특별","생각"];
+let activeQuickTags=new Set();
+
+function getTagPresets(){
+  if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
+  return data.tagPresets;
+}
+function renderQuickTags(){
+  const box=document.getElementById("quickTags");
+  box.innerHTML="";
+  getTagPresets().forEach(tag=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.className="quick-tag";
+    btn.dataset.tag=tag;
+    btn.textContent=tag;
+    btn.classList.toggle("active",activeQuickTags.has(tag));
+    btn.onclick=()=>{
+      if(activeQuickTags.has(tag)) activeQuickTags.delete(tag);
+      else activeQuickTags.add(tag);
+      btn.classList.toggle("active",activeQuickTags.has(tag));
+      scheduleDiarySave();
+    };
+    box.appendChild(btn);
+  });
+}
+
+function renderDiary(){
+  document.getElementById("dateButton").textContent=
+    formatKoreanDate(selectedDate);
+
+  const entry=data.diaries[selectedDate]||{};
+  diaryText.value=entry.text||"";
+  const tags=entry.tags||[];
+  const presets=getTagPresets();
+  activeQuickTags=new Set(tags.filter(t=>presets.includes(t)));
+  tagInput.value=tags.filter(t=>!presets.includes(t)).join(", ");
+  renderQuickTags();
+  document.getElementById("saveState").textContent="";
+}
+
+async function saveDiary(){
+  const text=diaryText.value;
+  const customTags=tagInput.value
+    .split(",")
+    .map(v=>v.trim())
+    .filter(Boolean);
+  const tags=[...activeQuickTags,...customTags.filter(t=>!activeQuickTags.has(t))];
+
+  if(!text.trim() && !tags.length){
+    delete data.diaries[selectedDate];
+  }else{
+    data.diaries[selectedDate]={
+      text,
+      tags,
+      updatedAt:Date.now()
+    };
+  }
+
+  await saveAll();
+
+  document.getElementById("saveState").textContent="저장됨";
+  setTimeout(()=>{
+    document.getElementById("saveState").textContent="";
+  },1000);
+}
+
+function scheduleDiarySave(){
+  document.getElementById("saveState").textContent="저장 중…";
+  clearTimeout(diaryTimer);
+  diaryTimer=setTimeout(saveDiary,450);
+}
+
+diaryText.addEventListener("input",scheduleDiarySave);
+tagInput.addEventListener("input",scheduleDiarySave);
+
+
+const DIARY_HEIGHT_KEY="DAY_DIARY_HEIGHT";
+function restoreDiaryHeight(){
+  const h=Number(localStorage.getItem(DIARY_HEIGHT_KEY));
+  if(Number.isFinite(h)&&h>=180) diaryText.style.height=h+"px";
+}
+let diaryResizeTimer=null;
+if("ResizeObserver" in window){
+  new ResizeObserver(entries=>{
+    const h=Math.round(entries[0]?.contentRect.height||0);
+    if(h<180)return;
+    clearTimeout(diaryResizeTimer);
+    diaryResizeTimer=setTimeout(()=>localStorage.setItem(DIARY_HEIGHT_KEY,String(h)),180);
+  }).observe(diaryText);
+}
+restoreDiaryHeight();
+
+document.getElementById("prevDay").onclick=()=>{
+  selectedDate=localDateString(addDays(parseDate(selectedDate),-1));
+  renderDiary();
+};
+
+document.getElementById("nextDay").onclick=()=>{
+  selectedDate=localDateString(addDays(parseDate(selectedDate),1));
+  renderDiary();
+};
+
+document.getElementById("dateButton").onclick=()=>{
+  const picker=document.getElementById("datePicker");
+  picker.value=selectedDate;
+
+  if(picker.showPicker) picker.showPicker();
+  else picker.click();
+};
+
+document.getElementById("datePicker").onchange=e=>{
+  if(e.target.value){
+    selectedDate=e.target.value;
+    renderDiary();
+  }
+};
+
+document.getElementById("deleteDiary").onclick=async()=>{
+  if(!data.diaries[selectedDate])return;
+
+  if(await confirmBox("이 일기를 삭제할까요?")){
+    delete data.diaries[selectedDate];
+    await saveAll();
+    renderDiary();
+  }
+};
+
+/* SEARCH */
+
+document.getElementById("searchToggle").onclick=()=>{
+  const panel=document.getElementById("searchPanel");
+  const editor=document.getElementById("diaryEditor");
+  const opening=panel.classList.contains("hidden");
+
+  panel.classList.toggle("hidden",!opening);
+  editor.classList.toggle("hidden",opening);
+  document.getElementById("dayDateNav").classList.toggle("hidden",opening);
+  document.getElementById("deleteDiary").classList.toggle("hidden",opening);
+  document.getElementById("searchToggle").textContent=opening?"←":"⌕";
+
+  if(opening){
+    document.getElementById("searchInput").focus();
+  }
+};
+
+document.getElementById("searchContentBtn").onclick=()=>{
+  searchMode="content";
+  document.getElementById("searchContentBtn").classList.add("active");
+  document.getElementById("searchTagBtn").classList.remove("active");
+  runSearch();
+};
+
+document.getElementById("searchTagBtn").onclick=()=>{
+  searchMode="tag";
+  document.getElementById("searchTagBtn").classList.add("active");
+  document.getElementById("searchContentBtn").classList.remove("active");
+  runSearch();
+};
+
+document.getElementById("searchInput").oninput=runSearch;
+
+function runSearch(){
+  const q=document.getElementById("searchInput")
+    .value.trim().toLowerCase();
+
+  const box=document.getElementById("searchResults");
+  box.innerHTML="";
+
+  if(!q)return;
+
+  const results=Object.entries(data.diaries)
+    .filter(([date,e])=>{
+      if(!(e.text||"").trim()) return false;
+      if(searchMode==="content"){
+        return (e.text||"").toLowerCase().includes(q);
+      }
+      return (e.tags||[]).some(t=>t.toLowerCase().includes(q));
+    })
+    .sort((a,b)=>b[0].localeCompare(a[0]));
+
+  results.forEach(([date,e])=>{
+    const div=document.createElement("div");
+    div.className="search-result";
+
+    const d=document.createElement("div");
+    d.className="search-result-date";
+    d.textContent=date;
+
+    const p=document.createElement("div");
+    p.className="search-preview";
+    p.textContent=e.text||"";
+
+    const tags=document.createElement("div");
+    tags.className="tagline";
+    tags.textContent=(e.tags||[]).map(t=>"#"+t).join(" ");
+
+    div.append(d,p,tags);
+
+    div.onclick=()=>{
+      selectedDate=date;
+      renderDiary();
+      document.getElementById("searchPanel").classList.add("hidden");
+      document.getElementById("diaryEditor").classList.remove("hidden");
+      document.querySelector(".day-header .date-nav").classList.remove("hidden");
+      document.getElementById("deleteDiary").classList.remove("hidden");
+      document.getElementById("searchToggle").textContent="⌕";
+      document.getElementById("searchToggle").setAttribute("aria-label","검색");
+      document.getElementById("deleteDiary").classList.remove("hidden");
+      document.querySelector(".date-nav").classList.remove("hidden");
+      document.getElementById("dayDateNav").classList.remove("hidden");
+      document.getElementById("deleteDiary").classList.remove("hidden");
+    };
+
+    box.appendChild(div);
+  });
+}
+
+/* =========================================================
+   PLAN
+========================================================= */
+
+let planMode="weekday";
+
+document.getElementById("weekdayTab").onclick=()=>{
+  planMode="weekday";
+  document.getElementById("weekdayTab").classList.add("active");
+  document.getElementById("weeklyTab").classList.remove("active");
+  document.getElementById("weekdayPlan").classList.remove("hidden");
+  document.getElementById("weeklyPlan").classList.add("hidden");
+};
+
+document.getElementById("weeklyTab").onclick=()=>{
+  planMode="weekly";
+  document.getElementById("weeklyTab").classList.add("active");
+  document.getElementById("weekdayTab").classList.remove("active");
+  document.getElementById("weeklyPlan").classList.remove("hidden");
+  document.getElementById("weekdayPlan").classList.add("hidden");
+  renderWeekly();
+};
+
+const weekdays=["월","화","수","목","금","토","일","주간"];
+
+function addPlanChip(type,title){
+  title=title.trim();
+  if(!title)return;
+
+  data.plan[type].chips.push({
+    id:uid(),
+    title,
+    done:false,
+    zone:type==="weekday" ? "loose" : "loose",
+    order:Date.now()
+  });
+
+  saveAll();
+  renderPlan();
+}
+
+document.getElementById("weekdayChipAdd").onclick=()=>{
+  const input=document.getElementById("weekdayChipInput");
+  addPlanChip("weekday",input.value);
+  input.value="";
+};
+
+document.getElementById("weekdayChipInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("weekdayChipAdd").click();
+});
+
+document.getElementById("weeklyChipAdd").onclick=()=>{
+  const input=document.getElementById("weeklyChipInput");
+  addPlanChip("weekly",input.value);
+  input.value="";
+};
+
+document.getElementById("weeklyChipInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("weeklyChipAdd").click();
+});
+
+enableTrashDrop(document.getElementById("weekdayTrash"),"weekday");
+enableTrashDrop(document.getElementById("weeklyTrash"),"weekly");
+
+let chipMenuTarget=null;
+const chipMenu=document.getElementById("chipMenu");
+function openChipMenu(chip,type,x,y){
+  chipMenuTarget={chip,type};
+  chipMenu.style.left=Math.min(x,window.innerWidth-90)+"px";
+  chipMenu.style.top=Math.min(y,window.innerHeight-55)+"px";
+  chipMenu.classList.remove("hidden");
+}
+function closeChipMenu(){chipMenu.classList.add("hidden");chipMenuTarget=null}
+document.getElementById("chipDeleteAction").onclick=async()=>{
+  if(!chipMenuTarget)return;
+  const {chip,type}=chipMenuTarget;
+  data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==chip.id);
+  closeChipMenu();
+  await saveAll();
+  renderPlan();
+};
+document.addEventListener("pointerdown",e=>{if(!e.target.closest("#chipMenu")) closeChipMenu()});
+
+function makeChip(chip,type){
+  const el=document.createElement("div");
+  el.className="chip"+(chip.done?" done":"");
+  el.draggable=true;
+  el.dataset.id=chip.id;
+  el.dataset.type=type;
+
+  const title=document.createElement("span");
+  title.textContent=chip.title;
+  el.appendChild(title);
+
+  el.onclick=async()=>{
+    if(el.dataset.suppressClick==="1"){el.dataset.suppressClick="0";return;}
+    chip.done=!chip.done;
+    await saveAll();
+    renderPlan();
+  };
+
+  el.addEventListener("dragstart",e=>{
+    el.dataset.suppressClick="1";
+    el.classList.add("dragging");
+    e.dataTransfer.setData("text/plain",
+      JSON.stringify({id:chip.id,type}));
+  });
+
+  el.addEventListener("dragend",()=>{
+    el.classList.remove("dragging");
+  });
+
+  return el;
+}
+
+function nextPlanOrder(type){
+  const orders=data.plan[type].chips.map(c=>Number(c.order)||0);
+  return (orders.length?Math.max(...orders):Date.now())+1;
+}
+function planChipsInZone(type,zone){
+  return data.plan[type].chips
+    .filter(c=>c.zone===zone)
+    .sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0));
+}
+
+function enableDrop(el,type,zone){
+  el.addEventListener("dragover",e=>{
+    e.preventDefault();
+    el.classList.add("drop-hover");
+  });
+
+  el.addEventListener("dragleave",()=>{
+    el.classList.remove("drop-hover");
+  });
+
+  el.addEventListener("drop",async e=>{
+    e.preventDefault();
+    el.classList.remove("drop-hover");
+
+    try{
+      const payload=JSON.parse(e.dataTransfer.getData("text/plain"));
+      if(payload.type!==type)return;
+
+      const chip=data.plan[type].chips.find(c=>c.id===payload.id);
+      if(!chip)return;
+
+      chip.zone=zone;
+      chip.order=nextPlanOrder(type);
+      await saveAll();
+      renderPlan();
+    }catch{}
+  });
+}
+
+function enableTrashDrop(el,type){
+  el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("drop-hover");});
+  el.addEventListener("dragleave",()=>el.classList.remove("drop-hover"));
+  el.addEventListener("drop",async e=>{
+    e.preventDefault();el.classList.remove("drop-hover");
+    try{
+      const payload=JSON.parse(e.dataTransfer.getData("text/plain"));
+      if(payload.type!==type)return;
+      data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==payload.id);
+      await saveAll();renderPlan();
+    }catch{}
+  });
+}
+
+function renderWeekday(){
+  const loose=document.getElementById("weekdayLoose");
+  loose.innerHTML="";
+  enableDrop(loose,"weekday","loose");
+
+  planChipsInZone("weekday","loose")
+    .forEach(c=>loose.appendChild(makeChip(c,"weekday")));
+
+  const board=document.getElementById("weekdayBoard");
+  board.innerHTML="";
+
+  weekdays.forEach((name,index)=>{
+    const row=document.createElement("div");
+    row.className="day-row";
+    if(index===5) row.classList.add("saturday");
+    if(index===6) row.classList.add("sunday");
+    if(index===7) row.classList.add("anyweek");
+
+    const label=document.createElement("div");
+    label.className="day-label";
+    label.textContent=name;
+
+    const zone=document.createElement("div");
+    zone.className="drop-zone";
+    const zoneKey=index===7 ? "any-week" : "day-"+index;
+    zone.dataset.zone=zoneKey;
+    enableDrop(zone,"weekday",zoneKey);
+
+    planChipsInZone("weekday",zoneKey)
+      .forEach(c=>zone.appendChild(makeChip(c,"weekday")));
+
+    row.append(label,zone);
+    board.appendChild(row);
+  });
+}
+
+/* WEEKLY */
+
+function ensureInitialWeeks(){
+  if(data.plan.weekly.weeks.length)return;
+
+  let key=weekKey(isoWeekInfo(new Date()));
+
+  for(let i=0;i<5;i++){
+    data.plan.weekly.weeks.push(key);
+    key=nextWeekKey(key);
+  }
+}
+
+function renderWeekly(){
+  ensureInitialWeeks();
+
+  const loose=document.getElementById("weeklyLoose");
+  loose.innerHTML="";
+  enableDrop(loose,"weekly","loose");
+
+  planChipsInZone("weekly","loose")
+    .forEach(c=>loose.appendChild(makeChip(c,"weekly")));
+
+  const rows=document.getElementById("weekRows");
+  rows.innerHTML="";
+
+  const currentKey=weekKey(isoWeekInfo(new Date()));
+
+  data.plan.weekly.weeks.sort((a,b)=>
+    infoFromWeekKey(a).monday-infoFromWeekKey(b).monday
+  );
+
+  data.plan.weekly.weeks.forEach(key=>{
+    const info=infoFromWeekKey(key);
+
+    const row=document.createElement("div");
+    row.className="week-row"+(key===currentKey?" current":"");
+
+    const head=document.createElement("div");
+    head.className="week-head";
+
+    const number=document.createElement("div");
+    number.className="week-number";
+    number.textContent=`${info.week} / ${info.totalWeeks}`;
+
+    const dates=document.createElement("div");
+    dates.className="week-dates";
+    dates.textContent=`${info.monday.getMonth()+1}/${info.monday.getDate()}\n${info.sunday.getMonth()+1}/${info.sunday.getDate()}`;
+    dates.style.whiteSpace="pre-line";
+
+    const minus=document.createElement("button");
+    minus.className="week-minus";
+    minus.textContent="−";
+
+    minus.onclick=async()=>{
+      const hasChips=data.plan.weekly.chips.some(c=>c.zone===key);
+
+      if(hasChips){
+        const ok=await confirmBox(
+          "이 주와 이 주에 남아 있는 항목을 모두 삭제할까요?"
+        );
+        if(!ok)return;
+      }
+
+      data.plan.weekly.chips=
+        data.plan.weekly.chips.filter(c=>c.zone!==key);
+
+      data.plan.weekly.weeks=
+        data.plan.weekly.weeks.filter(w=>w!==key);
+
+      await saveAll();
+      renderWeekly();
+    };
+
+    head.append(dates,number,minus);
+
+    const zone=document.createElement("div");
+    zone.className="drop-zone";
+    zone.dataset.zone=key;
+    enableDrop(zone,"weekly",key);
+
+    planChipsInZone("weekly",key)
+      .forEach(c=>zone.appendChild(makeChip(c,"weekly")));
+
+    row.append(head,zone);
+    rows.appendChild(row);
+  });
+}
+
+document.getElementById("addPrevWeek").onclick=async()=>{
+  ensureInitialWeeks();
+
+  const sorted=[...data.plan.weekly.weeks].sort((a,b)=>
+    infoFromWeekKey(a).monday-infoFromWeekKey(b).monday
+  );
+
+  const key=sorted.length
+    ? prevWeekKey(sorted[0])
+    : weekKey(isoWeekInfo(new Date()));
+
+  if(!data.plan.weekly.weeks.includes(key)){
+    data.plan.weekly.weeks.push(key);
+  }
+
+  data.plan.weekly.weeks.sort((a,b)=>
+    infoFromWeekKey(a).monday-infoFromWeekKey(b).monday
+  );
+
+  await saveAll();
+  renderWeekly();
+};
+
+document.getElementById("addNextWeek").onclick=async()=>{
+  ensureInitialWeeks();
+
+  const sorted=[...data.plan.weekly.weeks].sort((a,b)=>
+    infoFromWeekKey(a).monday-infoFromWeekKey(b).monday
+  );
+
+  const key=sorted.length
+    ? nextWeekKey(sorted[sorted.length-1])
+    : weekKey(isoWeekInfo(new Date()));
+
+  if(!data.plan.weekly.weeks.includes(key)){
+    data.plan.weekly.weeks.push(key);
+  }
+
+  data.plan.weekly.weeks.sort((a,b)=>
+    infoFromWeekKey(a).monday-infoFromWeekKey(b).monday
+  );
+
+  await saveAll();
+  renderWeekly();
+};
+
+async function deleteDone(type){
+  data.plan[type].chips=data.plan[type].chips.filter(c=>!c.done);
+  await saveAll();
+  renderPlan();
+}
+
+async function deleteAllPlan(type){
+  if(!await confirmBox("이 화면의 모든 항목을 삭제할까요?"))return;
+
+  data.plan[type].chips=[];
+
+  if(type==="weekly"){
+    data.plan.weekly.weeks=[];
+    ensureInitialWeeks();
+  }
+
+  await saveAll();
+  renderPlan();
+}
+
+document.getElementById("weekdayDoneDelete").onclick=
+  ()=>deleteDone("weekday");
+
+document.getElementById("weeklyDoneDelete").onclick=
+  ()=>deleteDone("weekly");
+
+document.getElementById("weekdayAllDelete").onclick=
+  ()=>deleteAllPlan("weekday");
+
+document.getElementById("weeklyAllDelete").onclick=
+  ()=>deleteAllPlan("weekly");
+
+function renderPlan(){
+  renderWeekday();
+  renderWeekly();
+}
+
+
+/* =========================================================
+   ANNUAL
+========================================================= */
+let annualSelectedYear=new Date().getFullYear();
+let annualEditingId=null;
+const ANNUAL_PALETTE=["#c98f86","#8fa8bd","#b39ab8","#c5a56f","#93a98e","#b88972","#8f9ab5","#c19aab"];
+function annualSegments(){data.annual??={segments:[],colors:{}};data.annual.segments??=[];data.annual.colors??={};return data.annual.segments;}
+function annualColors(){annualSegments();return data.annual.colors;}
+function projectColor(project){
+  const colors=annualColors();
+  if(colors[project])return colors[project];
+  let hash=0;for(const ch of project)hash=(hash*31+ch.charCodeAt(0))>>>0;
+  return ANNUAL_PALETTE[hash%ANNUAL_PALETTE.length];
+}
+function shadeHex(hex,amount=-0.34){
+  const h=hex.replace('#','');if(!/^[0-9a-fA-F]{6}$/.test(h))return '#5f514d';
+  const n=parseInt(h,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const f=v=>Math.max(0,Math.min(255,Math.round(amount<0?v*(1+amount):v+(255-v)*amount)));
+  return '#'+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function hexLuminance(hex){
+  const h=hex.replace('#','');if(!/^[0-9a-fA-F]{6}$/.test(h))return 1;
+  const n=parseInt(h,16),rgb=[(n>>16)&255,(n>>8)&255,n&255].map(v=>{
+    v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);
+  });
+  return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+}
+function annualInk(color){
+  const lum=hexLuminance(color);
+  return lum<0.50 ? '#ffffff' : shadeHex(color,-0.62);
+}
+function annualTitleInk(color){
+  const lum=hexLuminance(color);
+  return lum>=0.50 ? shadeHex(color,-0.62) : color;
+}
+function daysInYear(y){return ((y%4===0&&y%100!==0)||y%400===0)?366:365;}
+function dayOfYear(s){const d=parseDate(s),y=d.getFullYear();return Math.round((d-new Date(y,0,1,12))/86400000);}
+function clippedSegment(seg,y){const ys=`${y}-01-01`,ye=`${y}-12-31`;if(seg.end<ys||seg.start>ye)return null;return {start:seg.start<ys?ys:seg.start,end:seg.end>ye?ye:seg.end};}
+function appendMonthBands(track,y){
+  const total=daysInYear(y),now=new Date();
+  for(let m=0;m<12;m++){
+    const start=dayOfYear(`${y}-${pad(m+1)}-01`),end=m===11?total:dayOfYear(`${y}-${pad(m+2)}-01`);
+    const band=document.createElement('div');band.className='annual-month-band'+(now.getFullYear()===y&&now.getMonth()===m?' current':'');
+    band.style.left=(start/total*100)+'%';band.style.width=((end-start)/total*100)+'%';track.appendChild(band);
+  }
+}
+function renderAnnual(){
+  document.getElementById('annualYear').textContent=annualSelectedYear;
+  const segs=annualSegments().filter(s=>clippedSegment(s,annualSelectedYear)).sort((a,b)=>a.start.localeCompare(b.start));
+  renderAnnualDesktop(segs);renderAnnualMobile(segs);
+}
+function renderAnnualDesktop(segs){
+  const box=document.getElementById('annualDesktop');box.innerHTML='';
+  const projects=[...new Set(segs.map(s=>s.project))];
+  if(!projects.length){box.innerHTML='<div class="annual-empty">이 해에 기록된 구간이 없습니다.</div>';return;}
+  const grid=document.createElement('div');grid.className='annual-grid';
+  const head=document.createElement('div');head.className='annual-month-head';head.innerHTML='<div></div>';
+  const months=document.createElement('div');months.className='annual-months';
+  const now=new Date();for(let m=0;m<12;m++){const el=document.createElement('div');el.className='annual-month'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');el.textContent=(m+1)+'월';months.appendChild(el)}
+  head.appendChild(months);grid.appendChild(head);
+  const total=daysInYear(annualSelectedYear);
+  projects.forEach(project=>{
+    const row=document.createElement('div');row.className='annual-project-row';
+    const color=projectColor(project);
+    const name=document.createElement('div');name.className='annual-project-name';name.textContent=project;name.style.color=annualTitleInk(color);
+    const track=document.createElement('div');track.className='annual-track';appendMonthBands(track,annualSelectedYear);
+    segs.filter(s=>s.project===project).forEach(seg=>{
+      const c=clippedSegment(seg,annualSelectedYear),start=dayOfYear(c.start),end=dayOfYear(c.end),duration=end-start+1;
+      const title=`${seg.project}${seg.label?' · '+seg.label:''} · ${seg.start}${seg.start===seg.end?'':' ~ '+seg.end}`;
+      if(duration===1){
+        const dot=document.createElement('div');dot.className='annual-dot';dot.style.left=((start+.5)/total*100)+'%';dot.style.background=color;dot.title=title;dot.onclick=()=>openAnnualModal(seg);track.appendChild(dot);
+      }else{
+        const bar=document.createElement('div');bar.className='annual-bar'+(duration<=10?' short':'');bar.style.left=(start/total*100)+'%';bar.style.width=(duration/total*100)+'%';bar.style.background=color;bar.style.color=annualInk(color);bar.style.color=shadeHex(color,-0.42);bar.textContent=duration<=10?'':(seg.label||project);bar.title=title;bar.onclick=()=>openAnnualModal(seg);track.appendChild(bar);
+      }
+    });
+    row.append(name,track);grid.appendChild(row);
+  });box.appendChild(grid);
+}
+function renderAnnualMobile(segs){
+  const box=document.getElementById('annualMobile');box.innerHTML='';const now=new Date();
+  for(let m=0;m<12;m++){
+    const card=document.createElement('div');
+    card.className='annual-month-card'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');
+    const title=document.createElement('div');title.className='annual-month-title';title.textContent=(m+1)+'월';card.appendChild(title);
+    const ms=`${annualSelectedYear}-${pad(m+1)}-01`,me=localDateString(new Date(annualSelectedYear,m+1,0,12));
+    segs.filter(s=>s.start<=me&&s.end>=ms).forEach(seg=>{
+      const item=document.createElement('div');item.className='annual-card-item';
+      const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);
+      const project=document.createElement('div');project.className='annual-card-project';
+      project.textContent=seg.project+(seg.label?' · '+seg.label:'');
+      const meta=document.createElement('div');meta.className='annual-card-meta';
+      const startsHere=seg.start>=ms&&seg.start<=me,endsHere=seg.end>=ms&&seg.end<=me;
+      const sd=Number(seg.start.slice(8)),ed=Number(seg.end.slice(8));
+      if(seg.start===seg.end) meta.textContent=`● ${sd}일`;
+      else if(startsHere&&endsHere) meta.textContent=`${sd}일–${ed}일`;
+      else if(startsHere) meta.textContent=`${sd}일 →`;
+      else if(endsHere) meta.textContent=`→ ${ed}일`;
+      else meta.textContent='계속';
+      item.append(project,meta);item.onclick=()=>openAnnualModal(seg);card.appendChild(item);
+    });
+    box.appendChild(card);
+  }
+}
+function openAnnualModal(seg=null){
+  annualEditingId=seg?.id||null;document.getElementById('annualModalTitle').textContent=seg?'구간 수정':'구간 추가';
+  document.getElementById('annualProject').value=seg?.project||'';document.getElementById('annualLabel').value=seg?.label||'';
+  document.getElementById('annualColor').value=projectColor(seg?.project||'새 프로젝트');
+  document.getElementById('annualStart').value=seg?.start||`${annualSelectedYear}-01-01`;document.getElementById('annualEnd').value=seg?.end||`${annualSelectedYear}-01-01`;
+  document.getElementById('annualDelete').classList.toggle('hidden',!seg);document.getElementById('annualModal').classList.remove('hidden');
+}
+function closeAnnualModal(){document.getElementById('annualModal').classList.add('hidden');annualEditingId=null;}
+document.getElementById('annualAdd').onclick=()=>openAnnualModal();document.getElementById('annualClose').onclick=closeAnnualModal;document.getElementById('annualCancel').onclick=closeAnnualModal;document.getElementById('annualModal').onclick=e=>{if(e.target.id==='annualModal')closeAnnualModal()};
+document.getElementById('annualProject').addEventListener('change',e=>{const p=e.target.value.trim();if(p)document.getElementById('annualColor').value=projectColor(p)});
+document.getElementById('annualPrevYear').onclick=()=>{annualSelectedYear--;renderAnnual()};document.getElementById('annualNextYear').onclick=()=>{annualSelectedYear++;renderAnnual()};
+document.getElementById('annualSave').onclick=async()=>{
+  const project=document.getElementById('annualProject').value.trim(),label=document.getElementById('annualLabel').value.trim(),color=document.getElementById('annualColor').value,start=document.getElementById('annualStart').value,end=document.getElementById('annualEnd').value;
+  if(!project||!start||!end){alert('제목과 시작일, 종료일을 입력해주세요.');return}if(start>end){alert('기간을 확인해주세요.');return}
+  let oldProject=null;if(annualEditingId){const x=annualSegments().find(s=>s.id===annualEditingId);if(x){oldProject=x.project;Object.assign(x,{project,label,start,end})}}else annualSegments().push({id:uid(),project,label,start,end});
+  annualColors()[project]=color;
+  if(oldProject&&oldProject!==project&&!annualSegments().some(s=>s.project===oldProject))delete annualColors()[oldProject];
+  await saveAll();annualSelectedYear=Number(start.slice(0,4));closeAnnualModal();renderAnnual();
+};
+document.getElementById('annualDelete').onclick=async()=>{if(!annualEditingId)return;if(!await confirmBox('이 구간을 삭제할까요?'))return;const target=annualSegments().find(s=>s.id===annualEditingId);const project=target?.project;data.annual.segments=data.annual.segments.filter(s=>s.id!==annualEditingId);if(project&&!data.annual.segments.some(s=>s.project===project))delete annualColors()[project];closeAnnualModal();await saveAll();renderAnnual();};
+
+/* =========================================================
+   TODO
+========================================================= */
+
+function addTodo(list,title){
+  title=title.trim();
+  if(!title)return;
+
+  data.todo[list].push({
+    id:uid(),
+    title
+  });
+
+  saveAll();
+  renderTodo();
+  renderAnnual();
+}
+
+document.getElementById("todoAdd").onclick=()=>{
+  const input=document.getElementById("todoInput");
+  addTodo("todo",input.value);
+  input.value="";
+};
+
+document.getElementById("somedayAdd").onclick=()=>{
+  const input=document.getElementById("somedayInput");
+  addTodo("someday",input.value);
+  input.value="";
+};
+
+document.getElementById("scheduleAdd").onclick=()=>{
+  const date=document.getElementById("scheduleDate").value;
+  const input=document.getElementById("scheduleInput");
+  const title=input.value.trim();
+  if(!date||!title)return;
+  data.todo.schedule.push({id:uid(),title,date});
+  data.todo.schedule.sort((a,b)=>a.date.localeCompare(b.date));
+  saveAll();
+  input.value="";
+  renderTodo();
+};
+
+document.getElementById("todoInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("todoAdd").click();
+});
+
+document.getElementById("somedayInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("somedayAdd").click();
+});
+
+document.getElementById("scheduleInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("scheduleAdd").click();
+});
+
+async function completeTodo(list,id){
+  const index=data.todo[list].findIndex(x=>x.id===id);
+  if(index<0)return;
+
+  const item=data.todo[list][index];
+  data.todo[list].splice(index,1);
+
+  data.todo.completed.unshift({
+    id:item.id,
+    title:item.title,
+    completedDate:list==="schedule" ? item.date : localDateString()
+  });
+
+  await saveAll();
+  renderTodo();
+}
+
+async function deleteTodoItem(list,id){
+  data.todo[list]=data.todo[list].filter(x=>x.id!==id);
+  await saveAll();
+  renderTodo();
+}
+
+async function saveTodoTitleEdit(item,list,value){
+  const title=value.trim();
+  if(!title)return false;
+  const target=data.todo[list].find(x=>x.id===item.id);
+  if(!target)return false;
+  target.title=title;
+  await saveAll();
+  return true;
+}
+
+function startTodoTitleEdit(item,list,titleEl){
+  if(titleEl.dataset.editing==="1")return;
+  titleEl.dataset.editing="1";
+
+  const input=document.createElement("input");
+  input.type="text";
+  input.className="todo-title-edit";
+  input.value=item.title;
+  input.setAttribute("aria-label","할 일 수정");
+
+  let finished=false;
+  const original=item.title;
+
+  const finish=async save=>{
+    if(finished)return;
+    finished=true;
+    if(save){
+      const ok=await saveTodoTitleEdit(item,list,input.value);
+      if(!ok){
+        item.title=original;
+      }
+    }
+    renderTodo();
+  };
+
+  input.addEventListener("click",e=>e.stopPropagation());
+  input.addEventListener("pointerdown",e=>e.stopPropagation());
+  input.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){e.preventDefault();finish(true);}
+    else if(e.key==="Escape"){e.preventDefault();finish(false);}
+  });
+  input.addEventListener("blur",()=>finish(true));
+
+  titleEl.replaceWith(input);
+  input.focus();
+  input.setSelectionRange(input.value.length,input.value.length);
+}
+
+function makeTodoItem(item,list,index){
+  const el=document.createElement("div");
+  el.className="todo-item";
+  el.draggable=true;
+  el.dataset.id=item.id;
+  el.dataset.list=list;
+
+  const check=document.createElement("button");
+  check.className="check";
+  check.onclick=()=>completeTodo(list,item.id);
+
+  const title=document.createElement("div");
+  title.className="todo-title";
+  title.textContent=item.title;
+  title.title="클릭하여 수정";
+  title.onclick=e=>{
+    e.stopPropagation();
+    startTodoTitleEdit(item,list,title);
+  };
+
+  const dateLabel=document.createElement("div");
+  dateLabel.className="schedule-date";
+  dateLabel.textContent=list==="schedule" ? item.date.slice(5).replace("-",".") : "";
+
+  const handle=document.createElement("div");
+  handle.className="drag-handle";
+  handle.textContent="≡";
+
+  const del=document.createElement("button");
+  del.className="delete-mini";
+  del.textContent="×";
+  del.onclick=()=>deleteTodoItem(list,item.id);
+
+  el.addEventListener("dragstart",e=>{
+    e.dataTransfer.setData("text/plain",
+      JSON.stringify({
+        kind:"todo",
+        id:item.id,
+        from:list,
+        index
+      })
+    );
+  });
+
+  el.addEventListener("dragover",e=>{
+    e.preventDefault();
+  });
+
+  el.addEventListener("drop",async e=>{
+    e.preventDefault();
+    e.stopPropagation();
+
+    let p;
+    try{p=JSON.parse(e.dataTransfer.getData("text/plain"))}
+    catch{return}
+
+    if(p.kind!=="todo")return;
+
+    moveTodo(p.from,p.id,list,index);
+  });
+
+  el.append(check);
+  if(list==="schedule")el.append(dateLabel);
+  el.append(title,handle,del);
+  return el;
+}
+
+async function moveTodo(from,id,to,targetIndex){
+  const fromArr=data.todo[from];
+  const index=fromArr.findIndex(x=>x.id===id);
+  if(index<0)return;
+
+  const [item]=fromArr.splice(index,1);
+
+  let adjusted=targetIndex;
+
+  if(from===to && index<targetIndex){
+    adjusted--;
+  }
+
+  data.todo[to].splice(Math.max(0,adjusted),0,item);
+
+  await saveAll();
+  renderTodo();
+}
+
+function enableTodoListDrop(el,list){
+  el.ondragover=e=>e.preventDefault();
+
+  el.ondrop=async e=>{
+    if(e.target.closest(".todo-item"))return;
+
+    e.preventDefault();
+
+    let p;
+    try{p=JSON.parse(e.dataTransfer.getData("text/plain"))}
+    catch{return}
+
+    if(p.kind!=="todo")return;
+
+    moveTodo(p.from,p.id,list,data.todo[list].length);
+  };
+}
+
+function renderTodoList(list,elId){
+  const box=document.getElementById(elId);
+  box.innerHTML="";
+
+  data.todo[list].forEach((item,i)=>{
+    box.appendChild(makeTodoItem(item,list,i));
+  });
+
+  enableTodoListDrop(box,list);
+}
+
+let completedOpen=false;
+
+document.getElementById("completedToggle").onclick=()=>{
+  completedOpen=!completedOpen;
+  renderCompleted();
+};
+
+async function restoreCompleted(id){
+  const i=data.todo.completed.findIndex(x=>x.id===id);
+  if(i<0)return;
+
+  const [item]=data.todo.completed.splice(i,1);
+
+  data.todo.todo.push({
+    id:item.id,
+    title:item.title
+  });
+
+  await saveAll();
+  renderTodo();
+}
+
+async function deleteCompleted(id){
+  data.todo.completed=
+    data.todo.completed.filter(x=>x.id!==id);
+
+  await saveAll();
+  renderTodo();
+}
+
+async function editCompletedDate(item,anchor){
+  const picker=document.createElement("input");
+  picker.type="date";
+  picker.value=item.completedDate || localDateString();
+  const rect=anchor?.getBoundingClientRect();
+  picker.style.position="fixed";
+  picker.style.left=(rect ? rect.left : 12)+"px";
+  picker.style.top=(rect ? rect.bottom : 12)+"px";
+  picker.style.width="1px";picker.style.height="1px";picker.style.padding="0";picker.style.border="0";
+  picker.style.opacity="0.01";picker.style.pointerEvents="none";picker.style.zIndex="9999";
+  document.body.appendChild(picker);
+
+  picker.onchange=async()=>{
+    if(picker.value){
+      item.completedDate=picker.value;
+      await saveAll();
+      renderTodo();
+    }
+    picker.remove();
+  };
+  picker.onblur=()=>setTimeout(()=>picker.remove(),200);
+
+  if(picker.showPicker) picker.showPicker();
+  else picker.click();
+}
+
+function renderCompleted(){
+  const box=document.getElementById("completedList");
+
+  const currentYear=String(new Date().getFullYear());
+  const totalCompleted=data.todo.completed.length;
+  const yearCompleted=data.todo.completed.filter(
+    x=>x.completedDate?.startsWith(currentYear+"-")
+  ).length;
+
+  document.getElementById("completedCount").textContent=
+    `${yearCompleted}(${totalCompleted})`;
+
+  document.getElementById("completedArrow").textContent=
+    completedOpen?"⌃":"⌄";
+
+  box.classList.toggle("hidden",!completedOpen);
+  box.innerHTML="";
+
+  if(!completedOpen)return;
+
+  const groups={};
+
+  [...data.todo.completed]
+    .sort((a,b)=>b.completedDate.localeCompare(a.completedDate))
+    .forEach(item=>{
+      (groups[item.completedDate]??=[]).push(item);
+    });
+
+  Object.entries(groups).forEach(([date,items])=>{
+    const group=document.createElement("div");
+    group.className="completed-group";
+
+    const dateEl=document.createElement("div");
+    dateEl.className="completed-date";
+    dateEl.textContent=date;
+
+    group.appendChild(dateEl);
+
+    items.forEach(item=>{
+      const row=document.createElement("div");
+      row.className="completed-item";
+
+      const title=document.createElement("div");
+      title.className="completed-title";
+      title.textContent=item.title;
+
+      const actions=document.createElement("div");
+      actions.className="completed-actions";
+
+      const dateBtn=document.createElement("button");
+      dateBtn.textContent="날짜";
+      dateBtn.onclick=()=>editCompletedDate(item,dateBtn);
+
+      const restore=document.createElement("button");
+      restore.textContent="되돌리기";
+      restore.onclick=()=>restoreCompleted(item.id);
+
+      const del=document.createElement("button");
+      del.textContent="삭제";
+      del.onclick=()=>deleteCompleted(item.id);
+
+      actions.append(dateBtn,restore,del);
+      row.append(title,actions);
+      group.appendChild(row);
+    });
+
+    box.appendChild(group);
+  });
+}
+
+function renderTodo(){
+  renderTodoList("todo","todoList");
+  data.todo.schedule.sort((a,b)=>a.date.localeCompare(b.date));
+  renderTodoList("schedule","scheduleList");
+  renderTodoList("someday","somedayList");
+  renderCompleted();
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+const settingsModal=document.getElementById("settingsModal");
+
+document.getElementById("settingsBtn").onclick=()=>{
+  updateStats();
+  setDefaultExportDates();
+  renderTagPresetSettings();
+  settingsModal.classList.remove("hidden");
+};
+
+document.getElementById("settingsClose").onclick=()=>{
+  settingsModal.classList.add("hidden");
+};
+
+settingsModal.addEventListener("click",e=>{
+  if(e.target===settingsModal){
+    settingsModal.classList.add("hidden");
+  }
+});
+
+
+function renderTagPresetSettings(){
+  const box=document.getElementById("tagPresetList");
+  if(!box)return;
+  box.innerHTML="";
+  getTagPresets().forEach((tag,index)=>{
+    const row=document.createElement("div");
+    row.className="tag-preset-item";
+    const input=document.createElement("input");
+    input.value=tag;
+    const actions=document.createElement("div");
+    actions.className="tag-preset-actions";
+    const save=document.createElement("button");
+    save.textContent="수정";
+    const del=document.createElement("button");
+    del.textContent="삭제";
+    del.className="preset-delete";
+
+    save.onclick=async()=>{
+      const next=input.value.trim();
+      if(!next||next===tag)return;
+      if(getTagPresets().includes(next)){
+        alert("이미 있는 태그입니다.");
+        input.value=tag;
+        return;
+      }
+      Object.values(data.diaries).forEach(entry=>{
+        if(Array.isArray(entry.tags)){
+          entry.tags=[...new Set(entry.tags.map(t=>t===tag?next:t))];
+        }
+      });
+      data.tagPresets[index]=next;
+      if(activeQuickTags.delete(tag)) activeQuickTags.add(next);
+      await saveAll();
+      renderDiary();
+      renderTagPresetSettings();
+    };
+
+    del.onclick=async()=>{
+      Object.values(data.diaries).forEach(entry=>{
+        if(Array.isArray(entry.tags)) entry.tags=entry.tags.filter(t=>t!==tag);
+      });
+      data.tagPresets.splice(index,1);
+      activeQuickTags.delete(tag);
+      await saveAll();
+      renderDiary();
+      renderTagPresetSettings();
+    };
+
+    actions.append(save,del);
+    row.append(input,actions);
+    box.appendChild(row);
+  });
+}
+
+document.getElementById("tagPresetAdd").onclick=async()=>{
+  const input=document.getElementById("tagPresetInput");
+  const tag=input.value.trim();
+  if(!tag)return;
+  if(getTagPresets().includes(tag)){
+    alert("이미 있는 태그입니다.");
+    return;
+  }
+  data.tagPresets.push(tag);
+  input.value="";
+  await saveAll();
+  renderDiary();
+  renderTagPresetSettings();
+};
+
+document.getElementById("tagPresetInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("tagPresetAdd").click();
+});
+
+function updateStats(){
+  const year=String(new Date().getFullYear());
+
+  const diaryDates=Object.entries(data.diaries)
+    .filter(([,entry])=>(entry?.text||"").trim())
+    .map(([date])=>date);
+  const completed=data.todo.completed;
+
+  document.getElementById("statDiaryAll").textContent=
+    diaryDates.length;
+
+  document.getElementById("statDiaryYear").textContent=
+    diaryDates.filter(d=>d.startsWith(year+"-")).length;
+
+  document.getElementById("statTodoAll").textContent=
+    completed.length;
+
+  document.getElementById("statTodoYear").textContent=
+    completed.filter(x=>x.completedDate.startsWith(year+"-")).length;
+}
+
+function setDefaultExportDates(){
+  const year=new Date().getFullYear();
+
+  ["diaryExportFrom","todoExportFrom"].forEach(id=>{
+    document.getElementById(id).value=`${year}-01-01`;
+  });
+
+  ["diaryExportTo","todoExportTo"].forEach(id=>{
+    document.getElementById(id).value=`${year}-12-31`;
+  });
+}
+
+/* JSON */
+
+document.getElementById("jsonBackup").onclick=()=>{
+  const today=localDateString();
+
+  const backup={
+    app:"DAY",
+    formatVersion:1,
+    exportedAt:new Date().toISOString(),
+    data
+  };
+
+  downloadText(
+    `DAY_backup_${today}.json`,
+    JSON.stringify(backup,null,2),
+    "application/json"
+  );
+};
+
+document.getElementById("jsonRestoreBtn").onclick=()=>{
+  document.getElementById("jsonRestoreInput").click();
+};
+
+document.getElementById("jsonRestoreInput").onchange=async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+
+  try{
+    const parsed=JSON.parse(await file.text());
+
+    if(parsed.app!=="DAY" || !parsed.data){
+      alert("DAY 백업 파일이 아닙니다.");
+      return;
+    }
+
+    const ok=await confirmBox(
+      "현재 데이터가 백업 파일의 데이터로 교체됩니다. 복원할까요?"
+    );
+
+    if(!ok)return;
+
+    data=parsed.data;
+    await saveAll();
+
+    ensureInitialWeeks();
+    renderAll();
+    updateStats();
+
+    alert("복원이 완료되었습니다.");
+  }catch{
+    alert("백업 파일을 읽을 수 없습니다.");
+  }
+
+  e.target.value="";
+};
+
+/* MD EXPORT */
+
+document.getElementById("diaryExport").onclick=()=>{
+  const from=document.getElementById("diaryExportFrom").value;
+  const to=document.getElementById("diaryExportTo").value;
+
+  if(!from||!to)return;
+  if(from>to){
+    alert("기간을 확인해주세요.");
+    return;
+  }
+
+  const dates=Object.keys(data.diaries)
+    .filter(d=>d>=from&&d<=to)
+    .filter(d=>(data.diaries[d]?.text||"").trim())
+    .sort();
+
+  let md="";
+
+  dates.forEach(date=>{
+    const e=data.diaries[date];
+
+    md+=`### ${date}\n\n`;
+    if(e.text) md+=`${e.text.trim()}\n\n`;
+
+    if(e.tags?.length){
+      md+=e.tags.map(t=>"#"+t.replace(/\s+/g,"_")).join(" ")+"\n\n";
+    }
+  });
+
+  downloadText(
+    `DAY_${from}_${to}.md`,
+    md.trim()+"\n",
+    "text/markdown"
+  );
+};
+
+document.getElementById("todoExport").onclick=()=>{
+  const from=document.getElementById("todoExportFrom").value;
+  const to=document.getElementById("todoExportTo").value;
+
+  if(!from||!to)return;
+  if(from>to){
+    alert("기간을 확인해주세요.");
+    return;
+  }
+
+  const items=[...data.todo.completed]
+    .filter(x=>x.completedDate>=from&&x.completedDate<=to)
+    .sort((a,b)=>a.completedDate.localeCompare(b.completedDate));
+
+  const groups={};
+
+  items.forEach(x=>{
+    (groups[x.completedDate]??=[]).push(x);
+  });
+
+  let md="";
+
+  Object.entries(groups).forEach(([date,list])=>{
+    md+=`### ${date}\n\n`;
+    list.forEach(x=>{
+      md+=`- ${x.title}\n`;
+    });
+    md+="\n";
+  });
+
+  downloadText(
+    `TODO_${from}_${to}.md`,
+    md.trim()+"\n",
+    "text/markdown"
+  );
+};
+
+/* RESET */
+
+document.getElementById("resetAll").onclick=async()=>{
+  const first=await confirmBox(
+    "DAY의 모든 데이터를 삭제할까요?"
+  );
+  if(!first)return;
+
+  const second=await confirmBox(
+    "일기, PLAN, TODO, 연간 기록이 모두 삭제됩니다. 정말 초기화할까요?"
+  );
+  if(!second)return;
+
+  data=structuredClone(defaultData);
+  ensureInitialWeeks();
+
+  await saveAll();
+
+  selectedDate=localDateString();
+  renderAll();
+  updateStats();
+
+  settingsModal.classList.add("hidden");
+};
+
+/* =========================================================
+   PLAN TOUCH GESTURES
+   tap = complete/delete confirm / move = drag
+========================================================= */
+let pointerDrag=null;
+document.addEventListener("pointerdown",e=>{
+  const chip=e.target.closest(".chip");
+  if(!chip||e.pointerType==="mouse")return;
+  const startX=e.clientX,startY=e.clientY;
+  let dragging=false;
+  function move(ev){
+    if(!dragging&&Math.hypot(ev.clientX-startX,ev.clientY-startY)>10){
+      dragging=true;chip.dataset.suppressClick="1";
+      pointerDrag={chip,id:chip.dataset.id,type:chip.dataset.type};chip.style.opacity=".4";
+    }
+    if(!dragging)return;ev.preventDefault();
+    const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(target)target.classList.add("drop-hover");
+  }
+  async function up(ev){
+    cleanup();if(!dragging){pointerDrag=null;return;}
+    const drag=pointerDrag;pointerDrag=null;chip.style.opacity="";
+    const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(!target||!drag)return;
+    if(target.classList.contains("plan-trash")){
+      const trashType=target.id==="weekdayTrash"?"weekday":"weekly";
+      if(trashType===drag.type){
+        data.plan[drag.type].chips=data.plan[drag.type].chips.filter(c=>c.id!==drag.id);
+        await saveAll();renderPlan();
+      }
+      return;
+    }
+    let zone=null;
+    if(target.classList.contains("loose-area")){
+      zone="loose";
+    }else if(target.classList.contains("week-row")){
+      if(drag.type!=="weekly")return;
+      const i=[...document.querySelectorAll("#weekRows .week-row")].indexOf(target);
+      zone=data.plan.weekly.weeks[i];
+    }else if(target.classList.contains("day-row")){
+      if(drag.type!=="weekday")return;
+      const i=[...document.querySelectorAll("#weekdayBoard .day-row")].indexOf(target);
+      zone=i===7?"any-week":"day-"+i;
+    }
+    const item=data.plan[drag.type].chips.find(c=>c.id===drag.id);
+    if(item&&zone){
+      item.zone=zone;
+      item.order=nextPlanOrder(drag.type);
+      await saveAll();
+      renderPlan();
+    }
+  }
+  function cancel(){cleanup();if(pointerDrag?.chip)pointerDrag.chip.style.opacity="";pointerDrag=null;}
+  function cleanup(){document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",cancel);}
+  document.addEventListener("pointermove",move,{passive:false});
+  document.addEventListener("pointerup",up,{once:true});
+  document.addEventListener("pointercancel",cancel,{once:true});
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+
+function normalizeLoadedData(){
+  data.diaries ??={};
+  if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
+  data.plan ??={};
+  data.plan.weekday ??={chips:[]};
+  data.plan.weekly ??={chips:[],weeks:[]};
+  data.plan.weekday.chips ??=[];
+  data.plan.weekly.chips ??=[];
+  data.plan.weekly.weeks ??=[];
+
+  data.annual ??={segments:[]};
+  data.annual.segments ??=[];
+  data.annual.colors ??={};
+
+  data.todo ??={};
+  data.todo.todo ??=[];
+  data.todo.schedule ??=[];
+  data.todo.someday ??=[];
+  data.todo.completed ??=[];
+}
+
+function renderAll(){
+  renderDiary();
+  renderPlan();
+  renderTodo();
+}
+
+(async function init(){
+  await openDB();
+
+  const saved=await dbGet("data");
+
+  if(saved){
+    data=saved;
+    normalizeLoadedData();
+  }
+
+  ensureInitialWeeks();
+  await saveAll();
+
+  document.getElementById("scheduleDate").value=localDateString();
+  renderAll();
+
+  /* PLAN is deliberately the default screen */
+})();
+
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("Service worker registration failed:", err));
+  });
+}
+</script>
+
+</body>
+</html>
