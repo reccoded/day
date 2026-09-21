@@ -507,6 +507,57 @@ button{cursor:pointer}
 }
 
 
+
+/* PLAN layout refinements */
+.chip-create .plan-trash{
+  width:44px;min-width:44px;padding:0;
+  border:0;border-radius:11px;
+  background:var(--danger);color:#fff;
+  font-size:24px;font-weight:500;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+}
+.plan-trash.drop-hover{filter:brightness(.9);outline:3px solid rgba(165,101,95,.20)}
+.day-row{
+  display:grid;grid-template-columns:42px minmax(0,1fr);align-items:stretch;gap:8px;
+  min-height:82px;
+}
+.day-label{margin:0;display:flex;align-items:center;justify-content:center;min-height:60px}
+.day-row .drop-zone{min-height:60px;align-content:flex-start}
+.week-row{
+  display:grid;grid-template-columns:78px minmax(0,1fr) 30px;align-items:stretch;gap:8px;min-height:82px;
+}
+.week-head{display:contents;margin:0}
+.week-dates{display:flex;align-items:center;justify-content:flex-start;text-align:center;font-size:13px;line-height:1.65;position:relative;padding-left:2px}
+.week-dates::after{content:"";position:absolute;width:22px;height:1px;background:var(--line);left:14px;top:50%;transform:translateY(-50%)}
+.week-number{display:none}
+.week-minus{grid-column:3;grid-row:1;align-self:center;margin:0}
+.week-row>.drop-zone{grid-column:2;grid-row:1;min-height:60px;align-content:flex-start}
+.diary-tag-row{display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.quick-tags{display:flex;gap:6px;flex-wrap:wrap}
+.quick-tag{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 10px;font-size:13px;color:var(--muted)}
+.quick-tag.active{background:var(--accent-soft);border-color:#bdc9b7;color:#53664f;font-weight:700}
+.diary-tag-row .tag-input{flex:1;min-width:150px;width:auto;margin-top:0}
+@media(max-width:520px){
+  .chip-create .plan-trash{min-width:42px;width:42px;padding:0;font-size:23px}
+  .day-row{grid-template-columns:38px minmax(0,1fr);min-height:82px}
+  .week-row{grid-template-columns:104px minmax(0,1fr) 28px;min-height:82px}
+  .week-dates{font-size:12px}
+  .diary-tag-row{align-items:stretch}
+  .quick-tags{width:100%}
+  .diary-tag-row .tag-input{width:100%;flex-basis:100%}
+  .schedule-add #scheduleDate{color:var(--text);color-scheme:light}
+  .schedule-add #scheduleDate::-webkit-calendar-picker-indicator{display:block;opacity:.72;margin:0;padding:0;cursor:pointer}
+}
+
+
+.tag-preset-list{display:flex;flex-direction:column;gap:7px}
+.tag-preset-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center}
+.tag-preset-item input,.tag-preset-add input{min-width:0;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 10px;outline:none}
+.tag-preset-actions{display:flex;gap:5px}
+.tag-preset-actions button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font-size:12px}
+.tag-preset-actions .preset-delete{color:var(--danger);border-color:#d9bbb7}
+.tag-preset-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:10px}
+
 /* SETTINGS */
 
 .modal-bg{
@@ -641,8 +692,16 @@ button{cursor:pointer}
     <textarea id="diaryText" class="diary-text"
       placeholder="오늘의 기록을 남겨보세요."></textarea>
 
-    <input id="tagInput" class="tag-input"
-      placeholder="태그 - 일상, 일정, 업무, 특별, 생각">
+    <div class="diary-tag-row">
+      <div class="quick-tags" id="quickTags">
+        <button type="button" class="quick-tag" data-tag="일상">일상</button>
+        <button type="button" class="quick-tag" data-tag="일정">일정</button>
+        <button type="button" class="quick-tag" data-tag="업무">업무</button>
+        <button type="button" class="quick-tag" data-tag="특별">특별</button>
+        <button type="button" class="quick-tag" data-tag="생각">생각</button>
+      </div>
+      <input id="tagInput" class="tag-input" placeholder="태그 입력">
+    </div>
 
     <div id="saveState" class="save-state"></div>
   </div>
@@ -661,6 +720,7 @@ button{cursor:pointer}
     <div class="chip-create">
       <input id="weekdayChipInput" placeholder="할 일">
       <button class="plus-btn" id="weekdayChipAdd">＋</button>
+       <button class="plan-trash" id="weekdayTrash" aria-label="삭제">−</button>
     </div>
 
     <div class="loose-area drop-zone"
@@ -679,6 +739,7 @@ button{cursor:pointer}
     <div class="chip-create">
       <input id="weeklyChipInput" placeholder="할 일">
       <button class="plus-btn" id="weeklyChipAdd">＋</button>
+       <button class="plan-trash" id="weeklyTrash" aria-label="삭제">−</button>
     </div>
 
     <div class="loose-area drop-zone"
@@ -752,6 +813,16 @@ button{cursor:pointer}
       <div class="stat"><span>올해 일기</span><b id="statDiaryYear">0</b></div>
       <div class="stat"><span>전체 TODO</span><b id="statTodoAll">0</b></div>
       <div class="stat"><span>올해 TODO</span><b id="statTodoYear">0</b></div>
+    </div>
+
+    <div class="settings-card">
+      <h3>태그 프리셋</h3>
+      <div id="tagPresetList" class="tag-preset-list"></div>
+      <div class="tag-preset-add">
+        <input id="tagPresetInput" placeholder="새 태그">
+        <button class="primary-btn" id="tagPresetAdd">추가</button>
+      </div>
+      <div class="small" style="margin-top:8px">수정·삭제하면 기존 일기의 같은 태그에도 적용됩니다.</div>
     </div>
 
     <div class="settings-card">
@@ -852,6 +923,7 @@ function dbSet(key,value){
 const defaultData={
   version:1,
   diaries:{},
+  tagPresets:["일상","일정","업무","특별","생각"],
 
   plan:{
     weekday:{
@@ -1053,6 +1125,32 @@ let searchMode="content";
 
 const diaryText=document.getElementById("diaryText");
 const tagInput=document.getElementById("tagInput");
+const DEFAULT_TAG_PRESETS=["일상","일정","업무","특별","생각"];
+let activeQuickTags=new Set();
+
+function getTagPresets(){
+  if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
+  return data.tagPresets;
+}
+function renderQuickTags(){
+  const box=document.getElementById("quickTags");
+  box.innerHTML="";
+  getTagPresets().forEach(tag=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.className="quick-tag";
+    btn.dataset.tag=tag;
+    btn.textContent=tag;
+    btn.classList.toggle("active",activeQuickTags.has(tag));
+    btn.onclick=()=>{
+      if(activeQuickTags.has(tag)) activeQuickTags.delete(tag);
+      else activeQuickTags.add(tag);
+      btn.classList.toggle("active",activeQuickTags.has(tag));
+      scheduleDiarySave();
+    };
+    box.appendChild(btn);
+  });
+}
 
 function renderDiary(){
   document.getElementById("dateButton").textContent=
@@ -1060,16 +1158,21 @@ function renderDiary(){
 
   const entry=data.diaries[selectedDate]||{};
   diaryText.value=entry.text||"";
-  tagInput.value=(entry.tags||[]).join(", ");
+  const tags=entry.tags||[];
+  const presets=getTagPresets();
+  activeQuickTags=new Set(tags.filter(t=>presets.includes(t)));
+  tagInput.value=tags.filter(t=>!presets.includes(t)).join(", ");
+  renderQuickTags();
   document.getElementById("saveState").textContent="";
 }
 
 async function saveDiary(){
   const text=diaryText.value;
-  const tags=tagInput.value
+  const customTags=tagInput.value
     .split(",")
     .map(v=>v.trim())
     .filter(Boolean);
+  const tags=[...activeQuickTags,...customTags.filter(t=>!activeQuickTags.has(t))];
 
   if(!text.trim() && !tags.length){
     delete data.diaries[selectedDate];
@@ -1097,6 +1200,7 @@ function scheduleDiarySave(){
 
 diaryText.addEventListener("input",scheduleDiarySave);
 tagInput.addEventListener("input",scheduleDiarySave);
+
 
 const DIARY_HEIGHT_KEY="DAY_DIARY_HEIGHT";
 function restoreDiaryHeight(){
@@ -1194,6 +1298,7 @@ function runSearch(){
 
   const results=Object.entries(data.diaries)
     .filter(([date,e])=>{
+      if(!(e.text||"").trim()) return false;
       if(searchMode==="content"){
         return (e.text||"").toLowerCase().includes(q);
       }
@@ -1299,6 +1404,9 @@ document.getElementById("weeklyChipInput").addEventListener("keydown",e=>{
   if(e.key==="Enter")document.getElementById("weeklyChipAdd").click();
 });
 
+enableTrashDrop(document.getElementById("weekdayTrash"),"weekday");
+enableTrashDrop(document.getElementById("weeklyTrash"),"weekly");
+
 let chipMenuTarget=null;
 const chipMenu=document.getElementById("chipMenu");
 function openChipMenu(chip,type,x,y){
@@ -1331,17 +1439,9 @@ function makeChip(chip,type){
 
   el.onclick=async()=>{
     if(el.dataset.suppressClick==="1"){el.dataset.suppressClick="0";return;}
-    if(!chip.done){chip.done=true;await saveAll();renderPlan();return;}
-    if(await confirmBox("삭제하시겠습니까?")){
-      data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==chip.id);
-      await saveAll();renderPlan();
-    }
-  };
-
-  el.oncontextmenu=e=>{
-    e.preventDefault();
-    el.dataset.suppressClick="1";
-    openChipMenu(chip,type,e.clientX,e.clientY);
+    chip.done=!chip.done;
+    await saveAll();
+    renderPlan();
   };
 
   el.addEventListener("dragstart",e=>{
@@ -1386,6 +1486,20 @@ function enableDrop(el,type,zone){
   });
 }
 
+function enableTrashDrop(el,type){
+  el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("drop-hover");});
+  el.addEventListener("dragleave",()=>el.classList.remove("drop-hover"));
+  el.addEventListener("drop",async e=>{
+    e.preventDefault();el.classList.remove("drop-hover");
+    try{
+      const payload=JSON.parse(e.dataTransfer.getData("text/plain"));
+      if(payload.type!==type)return;
+      data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==payload.id);
+      await saveAll();renderPlan();
+    }catch{}
+  });
+}
+
 function renderWeekday(){
   const loose=document.getElementById("weekdayLoose");
   loose.innerHTML="";
@@ -1412,6 +1526,7 @@ function renderWeekday(){
     const zone=document.createElement("div");
     zone.className="drop-zone";
     const zoneKey=index===7 ? "any-week" : "day-"+index;
+    zone.dataset.zone=zoneKey;
     enableDrop(zone,"weekday",zoneKey);
 
     data.plan.weekday.chips
@@ -1471,7 +1586,8 @@ function renderWeekly(){
 
     const dates=document.createElement("div");
     dates.className="week-dates";
-    dates.textContent=`${shortDate(info.monday)} — ${shortDate(info.sunday)}`;
+    dates.textContent=`${info.monday.getMonth()+1}/${info.monday.getDate()}\n${info.sunday.getMonth()+1}/${info.sunday.getDate()}`;
+    dates.style.whiteSpace="pre-line";
 
     const minus=document.createElement("button");
     minus.className="week-minus";
@@ -1501,6 +1617,7 @@ function renderWeekly(){
 
     const zone=document.createElement("div");
     zone.className="drop-zone";
+    zone.dataset.zone=key;
     enableDrop(zone,"weekly",key);
 
     data.plan.weekly.chips
@@ -1977,6 +2094,7 @@ const settingsModal=document.getElementById("settingsModal");
 document.getElementById("settingsBtn").onclick=()=>{
   updateStats();
   setDefaultExportDates();
+  renderTagPresetSettings();
   settingsModal.classList.remove("hidden");
 };
 
@@ -1990,10 +2108,86 @@ settingsModal.addEventListener("click",e=>{
   }
 });
 
+
+function renderTagPresetSettings(){
+  const box=document.getElementById("tagPresetList");
+  if(!box)return;
+  box.innerHTML="";
+  getTagPresets().forEach((tag,index)=>{
+    const row=document.createElement("div");
+    row.className="tag-preset-item";
+    const input=document.createElement("input");
+    input.value=tag;
+    const actions=document.createElement("div");
+    actions.className="tag-preset-actions";
+    const save=document.createElement("button");
+    save.textContent="수정";
+    const del=document.createElement("button");
+    del.textContent="삭제";
+    del.className="preset-delete";
+
+    save.onclick=async()=>{
+      const next=input.value.trim();
+      if(!next||next===tag)return;
+      if(getTagPresets().includes(next)){
+        alert("이미 있는 태그입니다.");
+        input.value=tag;
+        return;
+      }
+      Object.values(data.diaries).forEach(entry=>{
+        if(Array.isArray(entry.tags)){
+          entry.tags=[...new Set(entry.tags.map(t=>t===tag?next:t))];
+        }
+      });
+      data.tagPresets[index]=next;
+      if(activeQuickTags.delete(tag)) activeQuickTags.add(next);
+      await saveAll();
+      renderDiary();
+      renderTagPresetSettings();
+    };
+
+    del.onclick=async()=>{
+      Object.values(data.diaries).forEach(entry=>{
+        if(Array.isArray(entry.tags)) entry.tags=entry.tags.filter(t=>t!==tag);
+      });
+      data.tagPresets.splice(index,1);
+      activeQuickTags.delete(tag);
+      await saveAll();
+      renderDiary();
+      renderTagPresetSettings();
+    };
+
+    actions.append(save,del);
+    row.append(input,actions);
+    box.appendChild(row);
+  });
+}
+
+document.getElementById("tagPresetAdd").onclick=async()=>{
+  const input=document.getElementById("tagPresetInput");
+  const tag=input.value.trim();
+  if(!tag)return;
+  if(getTagPresets().includes(tag)){
+    alert("이미 있는 태그입니다.");
+    return;
+  }
+  data.tagPresets.push(tag);
+  input.value="";
+  await saveAll();
+  renderDiary();
+  renderTagPresetSettings();
+};
+
+document.getElementById("tagPresetInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter")document.getElementById("tagPresetAdd").click();
+});
+
 function updateStats(){
   const year=String(new Date().getFullYear());
 
-  const diaryDates=Object.keys(data.diaries);
+  const diaryDates=Object.entries(data.diaries)
+    .filter(([,entry])=>(entry?.text||"").trim())
+    .map(([date])=>date);
   const completed=data.todo.completed;
 
   document.getElementById("statDiaryAll").textContent=
@@ -2091,6 +2285,7 @@ document.getElementById("diaryExport").onclick=()=>{
 
   const dates=Object.keys(data.diaries)
     .filter(d=>d>=from&&d<=to)
+    .filter(d=>(data.diaries[d]?.text||"").trim())
     .sort();
 
   let md="";
@@ -2191,16 +2386,24 @@ document.addEventListener("pointerdown",e=>{
       pointerDrag={chip,id:chip.dataset.id,type:chip.dataset.type};chip.style.opacity=".4";
     }
     if(!dragging)return;ev.preventDefault();
-    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone");
+    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone,.plan-trash");
     document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
     if(target)target.classList.add("drop-hover");
   }
   async function up(ev){
     cleanup();if(!dragging){pointerDrag=null;return;}
     const drag=pointerDrag;pointerDrag=null;chip.style.opacity="";
-    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone");
+    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone,.plan-trash");
     document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
     if(!target||!drag)return;
+    if(target.classList.contains("plan-trash")){
+      const trashType=target.id==="weekdayTrash"?"weekday":"weekly";
+      if(trashType===drag.type){
+        data.plan[drag.type].chips=data.plan[drag.type].chips.filter(c=>c.id!==drag.id);
+        await saveAll();renderPlan();
+      }
+      return;
+    }
     let zone=target.dataset.zone;
     if(!zone){
       const week=target.closest(".week-row");
@@ -2223,6 +2426,7 @@ document.addEventListener("pointerdown",e=>{
 
 function normalizeLoadedData(){
   data.diaries ??={};
+  if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
   data.plan ??={};
   data.plan.weekday ??={chips:[]};
   data.plan.weekly ??={chips:[],weeks:[]};
