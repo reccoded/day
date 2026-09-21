@@ -641,9 +641,9 @@ button{cursor:pointer}
     grid-template-columns:repeat(3,minmax(0,1fr));
     grid-template-rows:repeat(4,minmax(0,1fr));
     gap:7px;
-    height:calc(100dvh - 188px);
-    min-height:470px;
-    max-height:620px;
+    height:calc(100dvh - 164px);
+    min-height:494px;
+    max-height:644px;
   }
   .annual-head{margin-bottom:12px}
   .annual-year{font-size:18px}
@@ -2017,7 +2017,7 @@ function renderAnnualMobile(segs){
       else if(startsHere&&endsHere) meta.textContent=`${sd}일–${ed}일`;
       else if(startsHere) meta.textContent=`${sd}일 →`;
       else if(endsHere) meta.textContent=`→ ${ed}일`;
-      else meta.textContent='계속';
+      else meta.textContent='→';
       item.append(project,meta);item.onclick=()=>openAnnualModal(seg);card.appendChild(item);
     });
     box.appendChild(card);
