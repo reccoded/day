@@ -693,27 +693,11 @@ button{cursor:pointer}
 }
 
 @media(max-width:699px){
-  .touch-drag-ghost{
-    position:fixed !important;
-    left:0 !important;
-    top:0 !important;
-    z-index:9999 !important;
-    pointer-events:none !important;
-    opacity:.92 !important;
-    margin:0 !important;
-    box-shadow:0 8px 22px rgba(0,0,0,.16);
-    transition:none !important;
-  }
   .day-row.drop-hover,
   .week-row.drop-hover,
   .loose-area.drop-hover{
     outline:2px solid var(--accent);
     outline-offset:-2px;
-    background:var(--accent-soft);
-  }
-  .plan-trash.drop-hover{
-    outline:3px solid rgba(165,101,95,.28);
-    filter:brightness(.92);
   }
 }
 
@@ -2441,175 +2425,107 @@ document.getElementById("resetAll").onclick=async()=>{
 
 /* =========================================================
    PLAN TOUCH GESTURES
-   mobile: long-press then drag / tap remains tap
+   tap = complete/delete confirm / move = drag
 ========================================================= */
 let pointerDrag=null;
-
 document.addEventListener("pointerdown",e=>{
   const chip=e.target.closest(".chip");
-  if(!chip || e.pointerType==="mouse") return;
-
-  const startX=e.clientX, startY=e.clientY;
-  let lastX=startX, lastY=startY;
+  if(!chip||e.pointerType==="mouse")return;
+  const startX=e.clientX,startY=e.clientY;
   let dragging=false;
-  let cancelled=false;
-  let holdTimer=null;
-  let ghost=null;
-  let currentTarget=null;
-
-  const clearHover=()=>{
-    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
-    currentTarget=null;
-  };
-
-  const getDropTarget=(x,y)=>{
-    const raw=document.elementFromPoint(x,y);
-    if(!raw) return null;
-
-    const trash=raw.closest(".plan-trash");
-    if(trash) return trash;
-
-    const loose=raw.closest(".loose-area");
-    if(loose) return loose;
-
-    const week=raw.closest(".week-row");
-    if(week) return week;
-
-    const day=raw.closest(".day-row");
-    if(day) return day;
-
-    return raw.closest(".drop-zone");
-  };
-
-  const markTarget=target=>{
-    clearHover();
-    if(!target) return;
-    target.classList.add("drop-hover");
-    currentTarget=target;
-  };
-
-  const moveGhost=(x,y)=>{
-    if(!ghost) return;
-    ghost.style.transform=`translate3d(${x+14}px,${y+14}px,0)`;
-  };
-
-  const beginDrag=()=>{
-    if(cancelled || dragging) return;
-    dragging=true;
-    chip.dataset.suppressClick="1";
-    pointerDrag={chip,id:chip.dataset.id,type:chip.dataset.type};
-    chip.style.opacity=".28";
-
-    ghost=chip.cloneNode(true);
-    ghost.removeAttribute("id");
-    ghost.classList.add("touch-drag-ghost");
-    ghost.style.width=Math.min(chip.getBoundingClientRect().width,220)+"px";
-    document.body.appendChild(ghost);
-    moveGhost(lastX,lastY);
-    markTarget(getDropTarget(lastX,lastY));
-
-    if(navigator.vibrate) navigator.vibrate(18);
-  };
-
-  holdTimer=setTimeout(beginDrag,240);
-
   function move(ev){
-    lastX=ev.clientX; lastY=ev.clientY;
-    const dist=Math.hypot(lastX-startX,lastY-startY);
-
-    if(!dragging){
-      /* A normal swipe/scroll before the hold delay is not a drag. */
-      if(dist>9){
-        cancelled=true;
-        clearTimeout(holdTimer);
-      }
-      return;
+    if(!dragging&&Math.hypot(ev.clientX-startX,ev.clientY-startY)>10){
+      dragging=true;chip.dataset.suppressClick="1";
+      pointerDrag={chip,id:chip.dataset.id,type:chip.dataset.type};chip.style.opacity=".4";
     }
-
-    ev.preventDefault();
-    moveGhost(lastX,lastY);
-    markTarget(getDropTarget(lastX,lastY));
+    if(!dragging)return;ev.preventDefault();
+    const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row,.drop-zone");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(target)target.classList.add("drop-hover");
   }
-
   async function up(ev){
-    clearTimeout(holdTimer);
-    cleanup();
-
-    if(!dragging){
-      pointerDrag=null;
-      clearHover();
-      return;
-    }
-
-    ev.preventDefault();
-    const drag=pointerDrag;
-    pointerDrag=null;
-    chip.style.opacity="";
-    if(ghost){ghost.remove();ghost=null;}
-
-    const target=getDropTarget(ev.clientX,ev.clientY) || currentTarget;
-    clearHover();
-    if(!target || !drag) return;
-
+    cleanup();if(!dragging){pointerDrag=null;return;}
+    const drag=pointerDrag;pointerDrag=null;chip.style.opacity="";
+    const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row,.drop-zone");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(!target||!drag)return;
     if(target.classList.contains("plan-trash")){
       const trashType=target.id==="weekdayTrash"?"weekday":"weekly";
       if(trashType===drag.type){
         data.plan[drag.type].chips=data.plan[drag.type].chips.filter(c=>c.id!==drag.id);
-        await saveAll();
-        renderPlan();
+        await saveAll();renderPlan();
       }
       return;
     }
-
-    let zone=null;
-
-    if(target.classList.contains("loose-area")){
-      zone="loose";
-    }else{
+    let zone=target.dataset.zone;
+    if(!zone){
       const week=target.closest(".week-row");
-      if(week && drag.type==="weekly"){
-        const rows=[...document.querySelectorAll(".week-row")];
-        zone=data.plan.weekly.weeks[rows.indexOf(week)];
-      }else{
-        const day=target.closest(".day-row");
-        if(day && drag.type==="weekday"){
-          const rows=[...document.querySelectorAll(".day-row")];
-          const i=rows.indexOf(day);
-          zone=i===7?"any-week":"day-"+i;
-        }else{
-          zone=target.dataset?.zone || null;
-        }
-      }
+      if(week)zone=data.plan.weekly.weeks[[...document.querySelectorAll(".week-row")].indexOf(week)];
+      else{const day=target.closest(".day-row");if(day){const i=[...document.querySelectorAll(".day-row")].indexOf(day);zone=i===7?"any-week":"day-"+i;}}
     }
-
     const item=data.plan[drag.type].chips.find(c=>c.id===drag.id);
-    if(item && zone){
-      item.zone=zone;
-      await saveAll();
-      renderPlan();
-    }
+    if(item&&zone){item.zone=zone;await saveAll();renderPlan();}
   }
-
-  function cancel(){
-    clearTimeout(holdTimer);
-    cleanup();
-    clearHover();
-    if(pointerDrag?.chip) pointerDrag.chip.style.opacity="";
-    if(ghost) ghost.remove();
-    pointerDrag=null;
-  }
-
-  function cleanup(){
-    document.removeEventListener("pointermove",move);
-    document.removeEventListener("pointerup",up);
-    document.removeEventListener("pointercancel",cancel);
-  }
-
+  function cancel(){cleanup();if(pointerDrag?.chip)pointerDrag.chip.style.opacity="";pointerDrag=null;}
+  function cleanup(){document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",cancel);}
   document.addEventListener("pointermove",move,{passive:false});
   document.addEventListener("pointerup",up,{once:true});
   document.addEventListener("pointercancel",cancel,{once:true});
 });
 
+/* =========================================================
+   INIT
+========================================================= */
+
+function normalizeLoadedData(){
+  data.diaries ??={};
+  if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
+  data.plan ??={};
+  data.plan.weekday ??={chips:[]};
+  data.plan.weekly ??={chips:[],weeks:[]};
+  data.plan.weekday.chips ??=[];
+  data.plan.weekly.chips ??=[];
+  data.plan.weekly.weeks ??=[];
+
+  data.todo ??={};
+  data.todo.todo ??=[];
+  data.todo.schedule ??=[];
+  data.todo.someday ??=[];
+  data.todo.completed ??=[];
+}
+
+function renderAll(){
+  renderDiary();
+  renderPlan();
+  renderTodo();
+}
+
+(async function init(){
+  await openDB();
+
+  const saved=await dbGet("data");
+
+  if(saved){
+    data=saved;
+    normalizeLoadedData();
+  }
+
+  ensureInitialWeeks();
+  await saveAll();
+
+  document.getElementById("scheduleDate").value=localDateString();
+  renderAll();
+
+  /* PLAN is deliberately the default screen */
+})();
+
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("Service worker registration failed:", err));
+  });
+}
 </script>
 
 </body>
