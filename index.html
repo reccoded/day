@@ -509,35 +509,35 @@ button{cursor:pointer}
 
 
 
+
 @media(max-width:520px){
+  .schedule-add{
+    grid-template-columns:106px minmax(0,1fr) 42px;
+  }
   .schedule-add #scheduleDate{
-    -webkit-appearance:auto;
-    appearance:auto;
-    position:relative;
-    padding-right:27px !important;
-    background-color:transparent;
-    background-image:
-      linear-gradient(var(--muted),var(--muted)),
-      linear-gradient(var(--muted),var(--muted)),
-      linear-gradient(var(--muted),var(--muted)),
-      linear-gradient(var(--muted),var(--muted));
-    background-size:14px 1.5px,14px 1.5px,1.5px 13px,1.5px 13px;
-    background-position:
-      calc(100% - 8px) calc(50% - 5px),
-      calc(100% - 8px) calc(50% + 6px),
-      calc(100% - 21px) calc(50% + 1px),
-      calc(100% - 8px) calc(50% + 1px);
-    background-repeat:no-repeat;
+    width:100%;
+    min-width:0;
+    padding:10px 7px;
+    padding-right:5px;
+    font-size:13px;
+    color:var(--text);
+    color-scheme:light;
+    -webkit-appearance:none;
+    appearance:none;
+    background:none;
+    border-right:1px solid var(--line);
   }
   .schedule-add #scheduleDate::-webkit-calendar-picker-indicator{
-    display:block !important;
-    opacity:.72 !important;
-    visibility:visible !important;
-    position:absolute;
-    right:5px;
-    width:18px;height:18px;
-    padding:0;margin:0;
-    cursor:pointer;
+    display:none !important;
+    opacity:0 !important;
+    width:0 !important;
+    height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+  .schedule-add #scheduleInput{
+    padding-left:10px;
+    padding-right:7px;
   }
 }
 
@@ -586,8 +586,6 @@ button{cursor:pointer}
   .diary-tag-row{align-items:stretch}
   .quick-tags{width:100%}
   .diary-tag-row .tag-input{width:100%;flex-basis:100%}
-  .schedule-add #scheduleDate{color:var(--text);color-scheme:light}
-  .schedule-add #scheduleDate::-webkit-calendar-picker-indicator{display:block;opacity:.72;margin:0;padding:0;cursor:pointer}
 }
 
 
