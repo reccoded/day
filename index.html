@@ -508,6 +508,39 @@ button{cursor:pointer}
 
 
 
+
+@media(max-width:520px){
+  .schedule-add #scheduleDate{
+    -webkit-appearance:auto;
+    appearance:auto;
+    position:relative;
+    padding-right:27px !important;
+    background-color:transparent;
+    background-image:
+      linear-gradient(var(--muted),var(--muted)),
+      linear-gradient(var(--muted),var(--muted)),
+      linear-gradient(var(--muted),var(--muted)),
+      linear-gradient(var(--muted),var(--muted));
+    background-size:14px 1.5px,14px 1.5px,1.5px 13px,1.5px 13px;
+    background-position:
+      calc(100% - 8px) calc(50% - 5px),
+      calc(100% - 8px) calc(50% + 6px),
+      calc(100% - 21px) calc(50% + 1px),
+      calc(100% - 8px) calc(50% + 1px);
+    background-repeat:no-repeat;
+  }
+  .schedule-add #scheduleDate::-webkit-calendar-picker-indicator{
+    display:block !important;
+    opacity:.72 !important;
+    visibility:visible !important;
+    position:absolute;
+    right:5px;
+    width:18px;height:18px;
+    padding:0;margin:0;
+    cursor:pointer;
+  }
+}
+
 /* PLAN layout refinements */
 .chip-create .plan-trash{
   width:44px;min-width:44px;padding:0;
@@ -524,11 +557,19 @@ button{cursor:pointer}
 .day-label{margin:0;display:flex;align-items:center;justify-content:center;min-height:60px}
 .day-row .drop-zone{min-height:60px;align-content:flex-start}
 .week-row{
-  display:grid;grid-template-columns:78px minmax(0,1fr) 30px;align-items:stretch;gap:8px;min-height:82px;
+  display:grid;grid-template-columns:48px minmax(0,1fr) 30px;align-items:stretch;gap:5px;min-height:82px;
 }
 .week-head{display:contents;margin:0}
-.week-dates{display:flex;align-items:center;justify-content:flex-start;text-align:center;font-size:13px;line-height:1.65;position:relative;padding-left:2px}
-.week-dates::after{content:"";position:absolute;width:22px;height:1px;background:var(--line);left:14px;top:50%;transform:translateY(-50%)}
+.week-dates{
+  display:inline-flex;align-self:center;justify-self:start;
+  align-items:center;justify-content:center;text-align:center;
+  font-size:13px;line-height:1.65;white-space:pre-line;
+  position:relative;padding:0;
+}
+.week-dates::after{
+  content:"";position:absolute;left:0;right:0;top:50%;
+  height:1px;background:var(--line);transform:translateY(-50%);
+}
 .week-number{display:none}
 .week-minus{grid-column:3;grid-row:1;align-self:center;margin:0}
 .week-row>.drop-zone{grid-column:2;grid-row:1;min-height:60px;align-content:flex-start}
@@ -540,7 +581,7 @@ button{cursor:pointer}
 @media(max-width:520px){
   .chip-create .plan-trash{min-width:42px;width:42px;padding:0;font-size:23px}
   .day-row{grid-template-columns:38px minmax(0,1fr);min-height:82px}
-  .week-row{grid-template-columns:104px minmax(0,1fr) 28px;min-height:82px}
+  .week-row{grid-template-columns:48px minmax(0,1fr) 28px;min-height:82px}
   .week-dates{font-size:12px}
   .diary-tag-row{align-items:stretch}
   .quick-tags{width:100%}
