@@ -555,11 +555,12 @@ button{cursor:pointer}
 }
 .plan-trash.drop-hover{filter:brightness(.9);outline:3px solid rgba(165,101,95,.20)}
 .day-row{
-  display:grid;grid-template-columns:42px minmax(0,1fr);align-items:stretch;gap:8px;
+  display:grid;grid-template-columns:42px minmax(0,1fr) 28px;align-items:stretch;gap:8px;
   min-height:82px;
 }
 .day-label{margin:0;display:flex;align-items:center;justify-content:center;min-height:60px}
 .day-row .drop-zone{min-height:60px;align-content:flex-start}
+.day-minus{grid-column:3;align-self:center;border:0;background:transparent;font-size:20px;color:var(--muted);padding:2px 5px}
 .week-row{
   display:grid;grid-template-columns:48px minmax(0,1fr) 30px;align-items:stretch;gap:5px;min-height:82px;
 }
@@ -584,7 +585,7 @@ button{cursor:pointer}
 .diary-tag-row .tag-input{flex:1;min-width:150px;width:auto;margin-top:0}
 @media(max-width:520px){
   .chip-create .plan-trash{min-width:42px;width:42px;padding:0;font-size:23px}
-  .day-row{grid-template-columns:38px minmax(0,1fr);min-height:82px}
+  .day-row{grid-template-columns:38px minmax(0,1fr) 26px;min-height:82px}
   .week-row{grid-template-columns:48px minmax(0,1fr) 28px;min-height:82px}
   .week-dates{font-size:12px}
   .diary-tag-row{align-items:stretch}
@@ -608,6 +609,11 @@ button{cursor:pointer}
 .annual-year-nav{display:flex;align-items:center;gap:6px}
 .annual-year{font-size:20px;font-weight:750;min-width:76px;text-align:center}
 .annual-add{white-space:nowrap}
+.annual-head-actions{display:flex;align-items:center;gap:7px}
+.annual-settings-list{display:grid;gap:7px;max-height:52vh;overflow:auto}
+.annual-settings-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid var(--line);background:var(--bg);border-radius:10px}
+.annual-settings-item input{width:18px;height:18px;accent-color:var(--accent);flex:none}
+.annual-settings-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .annual-empty{padding:42px 12px;text-align:center;color:var(--muted)}
 .annual-desktop{display:block;overflow-x:visible;padding-bottom:8px}
 .annual-grid{width:100%;min-width:0;background:transparent}
@@ -661,15 +667,20 @@ button{cursor:pointer}
 }
 @media(min-width:900px){
   main{width:min(96vw,1380px);padding-left:24px;padding-right:24px}
-  #dayView,#todoView,#planView{max-width:1180px;margin:0 auto}
+  #dayView{max-width:1180px;margin:0 auto}
+  #planView{width:min(96vw,2220px);max-width:none;margin-left:50%;transform:translateX(-50%)}
   #todoView{display:none}
   #todoView.active{display:block}
+  /* TODO uses the same responsive wide canvas as YEAR. */
+  #todoView{width:min(96vw,2220px);max-width:none;margin-left:50%;transform:translateX(-50%)}
   #todoView .todo-section{min-width:0}
+  #todoView .todo-add,#todoView .schedule-add{width:52%;max-width:1120px;margin-bottom:12px}
   #todoView .todo-list{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     column-gap:12px;
     row-gap:8px;
+    min-height:44px;
   }
   #todoView .todo-list .todo-item{
     border-radius:11px!important;
@@ -678,8 +689,22 @@ button{cursor:pointer}
     margin:0;
     min-width:0;
   }
-  #planView .weekday-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  #planView #weekRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #todoView #completedList:not(.hidden){display:block}
+  #todoView .completed-group{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px 12px;
+  }
+  #todoView .completed-date{grid-column:1 / -1;margin:14px 0 0}
+  #todoView .completed-item{
+    min-width:0;
+    border:1px solid #e4ded1;
+    background:#f3eee4;
+    border-radius:11px;
+    padding:9px 10px;
+  }
+  #planView .weekday-board{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  #planView #weekRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   #planView .week-row{margin:0}
   #planView .plan-trash{
     line-height:0;
@@ -687,6 +712,18 @@ button{cursor:pointer}
   }
   #annualView{width:min(96vw,2220px);max-width:none;margin-left:50%;transform:translateX(-50%)}
   .nav{gap:42px}
+}
+
+@media(min-width:900px) and (max-width:1599px){
+  #todoView .todo-list,#todoView .completed-group{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(min-width:1600px){
+  #planView .weekday-board{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  #planView #weekRows{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+}
+@media(min-width:900px) and (max-width:1199px){
+  #todoView .todo-list,#todoView .completed-group{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #todoView .todo-add,#todoView .schedule-add{width:62%}
 }
 
 /* SETTINGS */
@@ -895,6 +932,10 @@ button{cursor:pointer}
       id="weekdayLoose" data-zone="loose"></div>
 
     <div class="weekday-board" id="weekdayBoard"></div>
+    <div class="week-add-actions">
+      <button class="add-week" id="addWeekdayDay">＋ 요일 추가</button>
+      <button class="add-week" id="addWeekdayWeek">주간 추가 ＋</button>
+    </div>
 
     <div class="plan-actions">
       <button class="soft-btn" id="weekdayDoneDelete">완료 삭제</button>
@@ -936,7 +977,10 @@ button{cursor:pointer}
         <div class="annual-year" id="annualYear"></div>
         <button class="arrow" id="annualNextYear">›</button>
       </div>
-      <button class="primary-btn annual-add" id="annualAdd">＋ 추가</button>
+      <div class="annual-head-actions">
+        <button class="soft-btn annual-add" id="annualSettingsBtn">설정</button>
+        <button class="primary-btn annual-add" id="annualAdd">＋ 추가</button>
+      </div>
     </div>
     <div id="annualDesktop" class="annual-desktop"></div>
     <div id="annualMobile" class="annual-mobile"></div>
@@ -1045,6 +1089,14 @@ button{cursor:pointer}
 </div>
 
 
+<div id="annualSettingsModal" class="dialog-bg hidden">
+  <div class="dialog">
+    <div class="modal-head"><h2>YEAR 표시 설정</h2><button class="icon-btn" id="annualSettingsClose">×</button></div>
+    <div class="small" style="margin-bottom:10px">체크한 제목만 YEAR에 표시됩니다.</div>
+    <div id="annualSettingsList" class="annual-settings-list"></div>
+  </div>
+</div>
+
 <div id="annualModal" class="dialog-bg hidden">
   <div class="dialog">
     <div class="modal-head"><h2 id="annualModalTitle">구간 추가</h2><button class="icon-btn" id="annualClose">×</button></div>
@@ -1133,6 +1185,7 @@ const defaultData={
   plan:{
     weekday:{
       chips:[],
+      slots:[]
     },
     weekly:{
       chips:[],
@@ -1140,7 +1193,7 @@ const defaultData={
     }
   },
 
-  annual:{segments:[],colors:{}},
+  annual:{segments:[],colors:{},order:[],hidden:[]},
 
   todo:{
     todo:[],
@@ -1574,7 +1627,7 @@ document.getElementById("weeklyTab").onclick=()=>{
   renderWeekly();
 };
 
-const weekdays=["월","화","수","목","금","토","일","주간"];
+const WEEKDAY_NAMES=["월","화","수","목","금","토","일"];
 
 function addPlanChip(type,title){
   title=title.trim();
@@ -1719,7 +1772,25 @@ function enableTrashDrop(el,type){
   });
 }
 
+function ensureWeekdaySlots(){
+  data.plan.weekday.slots ??=[];
+  if(data.plan.weekday.slots.length)return;
+  data.plan.weekday.slots=[
+    ...WEEKDAY_NAMES.map((name,i)=>({id:"base-day-"+i,type:"day",name,zone:"day-"+i})),
+    {id:"base-week",type:"week",name:"주간",zone:"any-week"}
+  ];
+}
+function nextWeekdayName(){
+  ensureWeekdaySlots();
+  const days=data.plan.weekday.slots.filter(x=>x.type==="day");
+  if(!days.length)return "월";
+  const last=WEEKDAY_NAMES.indexOf(days[days.length-1].name);
+  return WEEKDAY_NAMES[(last+1+7)%7];
+}
+function newWeekdayZone(type){return (type==="day"?"extra-day-":"extra-week-")+uid();}
+
 function renderWeekday(){
+  ensureWeekdaySlots();
   const loose=document.getElementById("weekdayLoose");
   loose.innerHTML="";
   enableDrop(loose,"weekday","loose");
@@ -1730,30 +1801,51 @@ function renderWeekday(){
   const board=document.getElementById("weekdayBoard");
   board.innerHTML="";
 
-  weekdays.forEach((name,index)=>{
+  data.plan.weekday.slots.forEach(slot=>{
     const row=document.createElement("div");
     row.className="day-row";
-    if(index===5) row.classList.add("saturday");
-    if(index===6) row.classList.add("sunday");
-    if(index===7) row.classList.add("anyweek");
+    if(slot.type==="day"&&slot.name==="토") row.classList.add("saturday");
+    if(slot.type==="day"&&slot.name==="일") row.classList.add("sunday");
+    if(slot.type==="week") row.classList.add("anyweek");
 
     const label=document.createElement("div");
     label.className="day-label";
-    label.textContent=name;
+    label.textContent=slot.name;
 
     const zone=document.createElement("div");
     zone.className="drop-zone";
-    const zoneKey=index===7 ? "any-week" : "day-"+index;
-    zone.dataset.zone=zoneKey;
-    enableDrop(zone,"weekday",zoneKey);
-
-    planChipsInZone("weekday",zoneKey)
+    zone.dataset.zone=slot.zone;
+    enableDrop(zone,"weekday",slot.zone);
+    planChipsInZone("weekday",slot.zone)
       .forEach(c=>zone.appendChild(makeChip(c,"weekday")));
 
-    row.append(label,zone);
+    const minus=document.createElement("button");
+    minus.className="day-minus";
+    minus.textContent="−";
+    minus.setAttribute("aria-label",slot.name+" 칸 삭제");
+    minus.onclick=async()=>{
+      const hasChips=data.plan.weekday.chips.some(c=>c.zone===slot.zone);
+      if(hasChips&&!await confirmBox("이 칸과 이 칸에 남아 있는 항목을 모두 삭제할까요?"))return;
+      data.plan.weekday.chips=data.plan.weekday.chips.filter(c=>c.zone!==slot.zone);
+      data.plan.weekday.slots=data.plan.weekday.slots.filter(x=>x.id!==slot.id);
+      await saveAll();renderWeekday();
+    };
+
+    row.append(label,zone,minus);
     board.appendChild(row);
   });
 }
+
+document.getElementById("addWeekdayDay").onclick=async()=>{
+  ensureWeekdaySlots();
+  data.plan.weekday.slots.push({id:uid(),type:"day",name:nextWeekdayName(),zone:newWeekdayZone("day")});
+  await saveAll();renderWeekday();
+};
+document.getElementById("addWeekdayWeek").onclick=async()=>{
+  ensureWeekdaySlots();
+  data.plan.weekday.slots.push({id:uid(),type:"week",name:"주간",zone:newWeekdayZone("week")});
+  await saveAll();renderWeekday();
+};
 
 /* WEEKLY */
 
@@ -1934,9 +2026,11 @@ function renderPlan(){
 let annualSelectedYear=new Date().getFullYear();
 let annualEditingId=null;
 const ANNUAL_PALETTE=["#c98f86","#8fa8bd","#b39ab8","#c5a56f","#93a98e","#b88972","#8f9ab5","#c19aab"];
-function annualSegments(){data.annual??={segments:[],colors:{},order:[]};data.annual.segments??=[];data.annual.colors??={};data.annual.order??=[];return data.annual.segments;}
+function annualSegments(){data.annual??={segments:[],colors:{},order:[],hidden:[]};data.annual.segments??=[];data.annual.colors??={};data.annual.order??=[];data.annual.hidden??=[];return data.annual.segments;}
 function annualColors(){annualSegments();return data.annual.colors;}
 function annualOrder(){annualSegments();return data.annual.order;}
+function annualHidden(){annualSegments();return data.annual.hidden;}
+function annualProjectVisible(project){return !annualHidden().includes(project);}
 function orderedAnnualProjects(segs){
   const found=[...new Set(segs.map(s=>s.project))],order=annualOrder();
   return [...order.filter(p=>found.includes(p)),...found.filter(p=>!order.includes(p))];
@@ -1993,7 +2087,7 @@ function appendMonthBands(track,y){
 }
 function renderAnnual(){
   document.getElementById('annualYear').textContent=annualSelectedYear;
-  const segs=annualSegments().filter(s=>clippedSegment(s,annualSelectedYear)).sort((a,b)=>a.start.localeCompare(b.start));
+  const segs=annualSegments().filter(s=>annualProjectVisible(s.project)&&clippedSegment(s,annualSelectedYear)).sort((a,b)=>a.start.localeCompare(b.start));
   renderAnnualDesktop(segs);renderAnnualMobile(segs);
 }
 function renderAnnualDesktop(segs){
@@ -2057,6 +2151,29 @@ function renderAnnualMobile(segs){
     box.appendChild(card);
   }
 }
+function renderAnnualSettings(){
+  const box=document.getElementById('annualSettingsList');box.innerHTML='';
+  const projects=orderedAnnualProjects(annualSegments());
+  if(!projects.length){box.innerHTML='<div class="small">등록된 제목이 없습니다.</div>';return;}
+  projects.forEach(project=>{
+    const label=document.createElement('label');label.className='annual-settings-item';
+    const check=document.createElement('input');check.type='checkbox';check.checked=annualProjectVisible(project);
+    const text=document.createElement('span');text.textContent=project;
+    check.onchange=async()=>{
+      const hidden=annualHidden();
+      if(check.checked) data.annual.hidden=hidden.filter(p=>p!==project);
+      else if(!hidden.includes(project)) hidden.push(project);
+      await saveAll();renderAnnual();
+    };
+    label.append(check,text);box.appendChild(label);
+  });
+}
+function openAnnualSettings(){renderAnnualSettings();document.getElementById('annualSettingsModal').classList.remove('hidden');}
+function closeAnnualSettings(){document.getElementById('annualSettingsModal').classList.add('hidden');}
+document.getElementById('annualSettingsBtn').onclick=openAnnualSettings;
+document.getElementById('annualSettingsClose').onclick=closeAnnualSettings;
+document.getElementById('annualSettingsModal').onclick=e=>{if(e.target.id==='annualSettingsModal')closeAnnualSettings();};
+
 function openAnnualModal(seg=null){
   annualEditingId=seg?.id||null;document.getElementById('annualModalTitle').textContent=seg?'구간 수정':'구간 추가';
   document.getElementById('annualProject').value=seg?.project||'';document.getElementById('annualLabel').value=seg?.label||'';
@@ -2076,12 +2193,14 @@ document.getElementById('annualSave').onclick=async()=>{
   if(oldProject&&oldProject!==project&&!annualSegments().some(s=>s.project===oldProject)){
     delete annualColors()[oldProject];
     const oi=annualOrder().indexOf(oldProject);if(oi>=0)annualOrder()[oi]=project;
+    const hi=annualHidden().indexOf(oldProject);if(hi>=0)annualHidden()[hi]=project;
   }
   await saveAll();annualSelectedYear=Number(start.slice(0,4));closeAnnualModal();renderAnnual();
 };
 document.getElementById('annualDelete').onclick=async()=>{if(!annualEditingId)return;if(!await confirmBox('이 구간을 삭제할까요?'))return;const target=annualSegments().find(s=>s.id===annualEditingId);const project=target?.project;data.annual.segments=data.annual.segments.filter(s=>s.id!==annualEditingId);if(project&&!data.annual.segments.some(s=>s.project===project)){
   delete annualColors()[project];
   data.annual.order=annualOrder().filter(p=>p!==project);
+  data.annual.hidden=annualHidden().filter(p=>p!==project);
 }closeAnnualModal();await saveAll();renderAnnual();};
 
 /* =========================================================
@@ -2212,7 +2331,7 @@ function startTodoTitleEdit(item,list,titleEl){
 function makeTodoItem(item,list,index){
   const el=document.createElement("div");
   el.className="todo-item";
-  el.draggable=true;
+  el.draggable=window.matchMedia('(pointer:fine)').matches;
   el.dataset.id=item.id;
   el.dataset.list=list;
 
@@ -2236,6 +2355,7 @@ function makeTodoItem(item,list,index){
   const handle=document.createElement("div");
   handle.className="drag-handle";
   handle.textContent="≡";
+  handle.oncontextmenu=e=>e.preventDefault();
 
   const del=document.createElement("button");
   del.className="delete-mini";
@@ -2282,6 +2402,7 @@ async function moveTodo(from,id,to,targetIndex){
   if(index<0)return;
 
   const [item]=fromArr.splice(index,1);
+  if(to==="schedule"&&!item.date)item.date=localDateString();
 
   let adjusted=targetIndex;
 
@@ -2789,7 +2910,8 @@ document.addEventListener("pointerdown",e=>{
     }else if(target.classList.contains("day-row")){
       if(drag.type!=="weekday")return;
       const i=[...document.querySelectorAll("#weekdayBoard .day-row")].indexOf(target);
-      zone=i===7?"any-week":"day-"+i;
+      ensureWeekdaySlots();
+      zone=data.plan.weekday.slots[i]?.zone||null;
     }
     const item=data.plan[drag.type].chips.find(c=>c.id===drag.id);
     if(item&&zone){
@@ -2807,6 +2929,53 @@ document.addEventListener("pointerdown",e=>{
 });
 
 /* =========================================================
+   TODO TOUCH DRAG
+   mobile: drag by the ≡ handle
+========================================================= */
+document.addEventListener("pointerdown",e=>{
+  const handle=e.target.closest(".drag-handle");
+  if(!handle||e.pointerType==="mouse")return;
+  const itemEl=handle.closest(".todo-item");
+  if(!itemEl)return;
+  e.preventDefault();
+  try{handle.setPointerCapture(e.pointerId);}catch{}
+  const from=itemEl.dataset.list,id=itemEl.dataset.id;
+  let dragging=false,lastTarget=null;
+  const startX=e.clientX,startY=e.clientY;
+  function move(ev){
+    if(!dragging&&Math.hypot(ev.clientX-startX,ev.clientY-startY)>8){dragging=true;itemEl.style.opacity=".4";}
+    if(!dragging)return;
+    ev.preventDefault();
+    document.querySelectorAll("#todoView .drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    const raw=document.elementFromPoint(ev.clientX,ev.clientY);
+    lastTarget=raw?.closest("#todoView .todo-item,#todoView .todo-list")||null;
+    if(lastTarget)lastTarget.classList.add("drop-hover");
+  }
+  async function up(ev){
+    cleanup();itemEl.style.opacity="";
+    document.querySelectorAll("#todoView .drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(!dragging)return;
+    const raw=document.elementFromPoint(ev.clientX,ev.clientY);
+    const targetItem=raw?.closest("#todoView .todo-item");
+    const targetList=raw?.closest("#todoView .todo-list");
+    if(targetItem){
+      const to=targetItem.dataset.list;
+      const listEl=targetItem.parentElement;
+      const targetIndex=[...listEl.children].indexOf(targetItem);
+      await moveTodo(from,id,to,targetIndex);
+    }else if(targetList){
+      const to=targetList.dataset.list;
+      await moveTodo(from,id,to,data.todo[to].length);
+    }
+  }
+  function cancel(){cleanup();itemEl.style.opacity="";document.querySelectorAll("#todoView .drop-hover").forEach(x=>x.classList.remove("drop-hover"));}
+  function cleanup(){document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",cancel);}
+  document.addEventListener("pointermove",move,{passive:false});
+  document.addEventListener("pointerup",up,{once:true});
+  document.addEventListener("pointercancel",cancel,{once:true});
+});
+
+/* =========================================================
    INIT
 ========================================================= */
 
@@ -2817,12 +2986,15 @@ function normalizeLoadedData(){
   data.plan.weekday ??={chips:[]};
   data.plan.weekly ??={chips:[],weeks:[]};
   data.plan.weekday.chips ??=[];
+  data.plan.weekday.slots ??=[];
   data.plan.weekly.chips ??=[];
   data.plan.weekly.weeks ??=[];
 
   data.annual ??={segments:[]};
   data.annual.segments ??=[];
   data.annual.colors ??={};
+  data.annual.order ??=[];
+  data.annual.hidden ??=[];
 
   data.todo ??={};
   data.todo.todo ??=[];
