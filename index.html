@@ -601,6 +601,66 @@ button{cursor:pointer}
 .tag-preset-actions .preset-delete{color:var(--danger);border-color:#d9bbb7}
 .tag-preset-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:10px}
 
+
+/* ANNUAL */
+.annual-wrap{width:100%}
+.annual-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.annual-year-nav{display:flex;align-items:center;gap:6px}
+.annual-year{font-size:20px;font-weight:750;min-width:76px;text-align:center}
+.annual-add{white-space:nowrap}
+.annual-empty{padding:42px 12px;text-align:center;color:var(--muted)}
+.annual-desktop{display:block;overflow-x:auto;padding-bottom:8px}
+.annual-grid{min-width:1050px;background:transparent}
+.annual-month-head,.annual-project-row{display:grid;grid-template-columns:150px minmax(900px,1fr)}
+.annual-project-name{padding:10px 14px 10px 2px;font-weight:750;display:flex;align-items:center;background:transparent}
+.annual-months{display:grid;grid-template-columns:repeat(12,1fr);height:38px}
+.annual-month{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);font-weight:700}
+.annual-month.current{color:#53664f;font-weight:750;background:rgba(225,231,221,.55);border-radius:8px 8px 0 0}
+.annual-project-row{min-height:58px}
+.annual-track{position:relative;min-height:58px}
+.annual-month-band{position:absolute;top:0;bottom:0;border-left:1px solid rgba(126,125,116,.11);pointer-events:none}
+.annual-month-band.current{background:rgba(225,231,221,.38)}
+.annual-month-band:last-of-type{border-right:1px solid rgba(126,125,116,.08)}
+.annual-bar{position:absolute;top:12px;height:34px;border:0;border-radius:9px;padding:0 9px;font-size:12px;line-height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:700;min-width:5px;text-align:center;display:flex;align-items:center;justify-content:center}
+.annual-bar:hover{filter:brightness(.97)}
+.annual-bar.short{padding:0;min-width:8px}
+.annual-dot{position:absolute;top:23px;width:12px;height:12px;border:0;border-radius:50%;transform:translateX(-50%);cursor:pointer;box-shadow:0 0 0 3px var(--bg)}
+.annual-dot:hover{transform:translateX(-50%) scale(1.15)}
+.annual-mobile{display:none}.annual-month-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px;min-height:112px}.annual-month-card.current{background:var(--accent-soft);border-color:#c7d0c2}.annual-month-title{font-size:13px;font-weight:750;margin-bottom:7px}.annual-card-item{font-size:11px;line-height:1.35;padding:5px 0;border-top:1px solid rgba(222,219,210,.75);cursor:pointer}.annual-card-project{font-weight:700}.annual-card-meta{color:var(--muted);margin-top:2px}
+.annual-form{display:grid;gap:11px}.annual-form label{font-size:12px;color:var(--muted);display:grid;gap:5px}.annual-form input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:10px;outline:none}.annual-form input[type="color"]{height:42px;padding:4px;cursor:pointer}.annual-form-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}.annual-edit-actions{display:flex;justify-content:space-between;gap:8px;margin-top:5px}.annual-edit-actions-right{display:flex;gap:7px}
+@media(max-width:699px){
+  .annual-desktop{display:none}.annual-mobile{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.annual-head{margin-bottom:12px}.annual-year{font-size:18px}.annual-add{padding:9px 11px}.annual-month-card{padding:8px;min-height:108px}.annual-card-item{font-size:10.5px}.annual-form-dates{grid-template-columns:1fr}
+}
+@media(min-width:900px){
+  main{width:min(96vw,1380px);padding-left:24px;padding-right:24px}
+  #dayView,#todoView,#planView{max-width:1180px;margin:0 auto}
+  #todoView{display:none}
+  #todoView.active{display:block}
+  #todoView .todo-section{min-width:0}
+  #todoView .todo-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:12px;
+    row-gap:8px;
+  }
+  #todoView .todo-list .todo-item{
+    border-radius:11px!important;
+    border:1px solid #e4ded1;
+    background:#f3eee4;
+    margin:0;
+    min-width:0;
+  }
+  #planView .weekday-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #planView #weekRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #planView .week-row{margin:0}
+  #planView .plan-trash{
+    line-height:0;
+    padding-bottom:3px;
+  }
+  #annualView{max-width:none}
+  .nav{gap:42px}
+}
+
 /* SETTINGS */
 
 .modal-bg{
@@ -737,6 +797,7 @@ button{cursor:pointer}
     <button data-main="day">DAY</button>
     <button data-main="plan" class="active">PLAN</button>
     <button data-main="todo">TODO</button>
+    <button data-main="annual">YEAR</button>
   </nav>
   <button class="icon-btn" id="settingsBtn" aria-label="설정">⚙</button>
 </header>
@@ -834,6 +895,23 @@ button{cursor:pointer}
       <button class="soft-btn" id="weeklyDoneDelete">완료 삭제</button>
       <button class="danger-btn" id="weeklyAllDelete">전체 삭제</button>
     </div>
+  </div>
+</section>
+
+
+<!-- ANNUAL -->
+<section id="annualView" class="view">
+  <div class="annual-wrap">
+    <div class="annual-head">
+      <div class="annual-year-nav">
+        <button class="arrow" id="annualPrevYear">‹</button>
+        <div class="annual-year" id="annualYear"></div>
+        <button class="arrow" id="annualNextYear">›</button>
+      </div>
+      <button class="primary-btn annual-add" id="annualAdd">＋ 추가</button>
+    </div>
+    <div id="annualDesktop" class="annual-desktop"></div>
+    <div id="annualMobile" class="annual-mobile"></div>
   </div>
 </section>
 
@@ -938,6 +1016,26 @@ button{cursor:pointer}
   </div>
 </div>
 
+
+<div id="annualModal" class="dialog-bg hidden">
+  <div class="dialog">
+    <div class="modal-head"><h2 id="annualModalTitle">구간 추가</h2><button class="icon-btn" id="annualClose">×</button></div>
+    <div class="annual-form">
+      <label>제목<input id="annualProject" maxlength="40" placeholder="제목을 입력하세요"></label>
+      <label>색상<input id="annualColor" type="color" value="#c98f86"></label>
+      <label>단계 메모<input id="annualLabel" maxlength="50" placeholder="단계 및 메모를 입력하세요"></label>
+      <div class="annual-form-dates">
+        <label>시작일<input id="annualStart" type="date"></label>
+        <label>종료일<input id="annualEnd" type="date"></label>
+      </div>
+      <div class="annual-edit-actions">
+        <button class="danger-btn hidden" id="annualDelete">삭제</button>
+        <div class="annual-edit-actions-right"><button class="soft-btn" id="annualCancel">취소</button><button class="primary-btn" id="annualSave">저장</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="chipMenu" class="chip-menu hidden"><button id="chipDeleteAction">삭제</button></div>
 
 <div id="dialogBg" class="dialog-bg hidden">
@@ -1013,6 +1111,8 @@ const defaultData={
       weeks:[]
     }
   },
+
+  annual:{segments:[],colors:{}},
 
   todo:{
     todo:[],
@@ -1191,6 +1291,7 @@ document.querySelectorAll("[data-main]").forEach(btn=>{
 
     if(btn.dataset.main==="todo") renderTodo();
     if(btn.dataset.main==="plan") renderPlan();
+    if(btn.dataset.main==="annual") renderAnnual();
   };
 });
 
@@ -1798,6 +1899,96 @@ function renderPlan(){
   renderWeekly();
 }
 
+
+/* =========================================================
+   ANNUAL
+========================================================= */
+let annualSelectedYear=new Date().getFullYear();
+let annualEditingId=null;
+const ANNUAL_PALETTE=["#c98f86","#8fa8bd","#b39ab8","#c5a56f","#93a98e","#b88972","#8f9ab5","#c19aab"];
+function annualSegments(){data.annual??={segments:[],colors:{}};data.annual.segments??=[];data.annual.colors??={};return data.annual.segments;}
+function annualColors(){annualSegments();return data.annual.colors;}
+function projectColor(project){
+  const colors=annualColors();
+  if(colors[project])return colors[project];
+  let hash=0;for(const ch of project)hash=(hash*31+ch.charCodeAt(0))>>>0;
+  return ANNUAL_PALETTE[hash%ANNUAL_PALETTE.length];
+}
+function shadeHex(hex,amount=-0.34){
+  const h=hex.replace('#','');if(!/^[0-9a-fA-F]{6}$/.test(h))return '#5f514d';
+  const n=parseInt(h,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const f=v=>Math.max(0,Math.min(255,Math.round(amount<0?v*(1+amount):v+(255-v)*amount)));
+  return '#'+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function daysInYear(y){return ((y%4===0&&y%100!==0)||y%400===0)?366:365;}
+function dayOfYear(s){const d=parseDate(s),y=d.getFullYear();return Math.round((d-new Date(y,0,1,12))/86400000);}
+function clippedSegment(seg,y){const ys=`${y}-01-01`,ye=`${y}-12-31`;if(seg.end<ys||seg.start>ye)return null;return {start:seg.start<ys?ys:seg.start,end:seg.end>ye?ye:seg.end};}
+function appendMonthBands(track,y){
+  const total=daysInYear(y),now=new Date();
+  for(let m=0;m<12;m++){
+    const start=dayOfYear(`${y}-${pad(m+1)}-01`),end=m===11?total:dayOfYear(`${y}-${pad(m+2)}-01`);
+    const band=document.createElement('div');band.className='annual-month-band'+(now.getFullYear()===y&&now.getMonth()===m?' current':'');
+    band.style.left=(start/total*100)+'%';band.style.width=((end-start)/total*100)+'%';track.appendChild(band);
+  }
+}
+function renderAnnual(){
+  document.getElementById('annualYear').textContent=annualSelectedYear;
+  const segs=annualSegments().filter(s=>clippedSegment(s,annualSelectedYear)).sort((a,b)=>a.start.localeCompare(b.start));
+  renderAnnualDesktop(segs);renderAnnualMobile(segs);
+}
+function renderAnnualDesktop(segs){
+  const box=document.getElementById('annualDesktop');box.innerHTML='';
+  const projects=[...new Set(segs.map(s=>s.project))];
+  if(!projects.length){box.innerHTML='<div class="annual-empty">이 해에 기록된 구간이 없습니다.</div>';return;}
+  const grid=document.createElement('div');grid.className='annual-grid';
+  const head=document.createElement('div');head.className='annual-month-head';head.innerHTML='<div></div>';
+  const months=document.createElement('div');months.className='annual-months';
+  const now=new Date();for(let m=0;m<12;m++){const el=document.createElement('div');el.className='annual-month'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');el.textContent=(m+1)+'월';months.appendChild(el)}
+  head.appendChild(months);grid.appendChild(head);
+  const total=daysInYear(annualSelectedYear);
+  projects.forEach(project=>{
+    const row=document.createElement('div');row.className='annual-project-row';
+    const color=projectColor(project);
+    const name=document.createElement('div');name.className='annual-project-name';name.textContent=project;name.style.color=shadeHex(color,-0.42);
+    const track=document.createElement('div');track.className='annual-track';appendMonthBands(track,annualSelectedYear);
+    segs.filter(s=>s.project===project).forEach(seg=>{
+      const c=clippedSegment(seg,annualSelectedYear),start=dayOfYear(c.start),end=dayOfYear(c.end),duration=end-start+1;
+      const title=`${seg.project}${seg.label?' · '+seg.label:''} · ${seg.start}${seg.start===seg.end?'':' ~ '+seg.end}`;
+      if(duration===1){
+        const dot=document.createElement('div');dot.className='annual-dot';dot.style.left=((start+.5)/total*100)+'%';dot.style.background=color;dot.title=title;dot.onclick=()=>openAnnualModal(seg);track.appendChild(dot);
+      }else{
+        const bar=document.createElement('div');bar.className='annual-bar'+(duration<=10?' short':'');bar.style.left=(start/total*100)+'%';bar.style.width=(duration/total*100)+'%';bar.style.background=color;bar.style.color=shadeHex(color,-0.42);bar.textContent=duration<=10?'':(seg.label||project);bar.title=title;bar.onclick=()=>openAnnualModal(seg);track.appendChild(bar);
+      }
+    });
+    row.append(name,track);grid.appendChild(row);
+  });box.appendChild(grid);
+}
+function renderAnnualMobile(segs){
+  const box=document.getElementById('annualMobile');box.innerHTML='';const now=new Date();
+  for(let m=0;m<12;m++){const card=document.createElement('div');card.className='annual-month-card'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');const title=document.createElement('div');title.className='annual-month-title';title.textContent=(m+1)+'월';card.appendChild(title);
+    const ms=`${annualSelectedYear}-${pad(m+1)}-01`,me=localDateString(new Date(annualSelectedYear,m+1,0,12));segs.filter(s=>s.start<=me&&s.end>=ms).forEach(seg=>{const item=document.createElement('div');item.className='annual-card-item';const a=seg.start<ms?ms:seg.start,b=seg.end>me?me:seg.end;item.innerHTML=`<div class="annual-card-project"></div><div class="annual-card-meta"></div>`;item.children[0].textContent=seg.project+(seg.label?' · '+seg.label:'');item.children[1].textContent=a===b?`${Number(a.slice(8))}일`:`${Number(a.slice(8))}일–${Number(b.slice(8))}일`;item.onclick=()=>openAnnualModal(seg);card.appendChild(item)});box.appendChild(card)}
+}
+function openAnnualModal(seg=null){
+  annualEditingId=seg?.id||null;document.getElementById('annualModalTitle').textContent=seg?'구간 수정':'구간 추가';
+  document.getElementById('annualProject').value=seg?.project||'';document.getElementById('annualLabel').value=seg?.label||'';
+  document.getElementById('annualColor').value=projectColor(seg?.project||'새 프로젝트');
+  document.getElementById('annualStart').value=seg?.start||`${annualSelectedYear}-01-01`;document.getElementById('annualEnd').value=seg?.end||`${annualSelectedYear}-01-01`;
+  document.getElementById('annualDelete').classList.toggle('hidden',!seg);document.getElementById('annualModal').classList.remove('hidden');
+}
+function closeAnnualModal(){document.getElementById('annualModal').classList.add('hidden');annualEditingId=null;}
+document.getElementById('annualAdd').onclick=()=>openAnnualModal();document.getElementById('annualClose').onclick=closeAnnualModal;document.getElementById('annualCancel').onclick=closeAnnualModal;document.getElementById('annualModal').onclick=e=>{if(e.target.id==='annualModal')closeAnnualModal()};
+document.getElementById('annualProject').addEventListener('change',e=>{const p=e.target.value.trim();if(p)document.getElementById('annualColor').value=projectColor(p)});
+document.getElementById('annualPrevYear').onclick=()=>{annualSelectedYear--;renderAnnual()};document.getElementById('annualNextYear').onclick=()=>{annualSelectedYear++;renderAnnual()};
+document.getElementById('annualSave').onclick=async()=>{
+  const project=document.getElementById('annualProject').value.trim(),label=document.getElementById('annualLabel').value.trim(),color=document.getElementById('annualColor').value,start=document.getElementById('annualStart').value,end=document.getElementById('annualEnd').value;
+  if(!project||!start||!end){alert('이름과 시작일, 종료일을 입력해주세요.');return}if(start>end){alert('기간을 확인해주세요.');return}
+  let oldProject=null;if(annualEditingId){const x=annualSegments().find(s=>s.id===annualEditingId);if(x){oldProject=x.project;Object.assign(x,{project,label,start,end})}}else annualSegments().push({id:uid(),project,label,start,end});
+  annualColors()[project]=color;
+  if(oldProject&&oldProject!==project&&!annualSegments().some(s=>s.project===oldProject))delete annualColors()[oldProject];
+  await saveAll();annualSelectedYear=Number(start.slice(0,4));closeAnnualModal();renderAnnual();
+};
+document.getElementById('annualDelete').onclick=async()=>{if(!annualEditingId)return;if(!await confirmBox('이 구간을 삭제할까요?'))return;const target=annualSegments().find(s=>s.id===annualEditingId);const project=target?.project;data.annual.segments=data.annual.segments.filter(s=>s.id!==annualEditingId);if(project&&!data.annual.segments.some(s=>s.project===project))delete annualColors()[project];closeAnnualModal();await saveAll();renderAnnual();};
+
 /* =========================================================
    TODO
 ========================================================= */
@@ -1813,6 +2004,7 @@ function addTodo(list,title){
 
   saveAll();
   renderTodo();
+  renderAnnual();
 }
 
 document.getElementById("todoAdd").onclick=()=>{
@@ -2440,7 +2632,7 @@ document.getElementById("resetAll").onclick=async()=>{
   if(!first)return;
 
   const second=await confirmBox(
-    "일기, PLAN, TODO 기록이 모두 삭제됩니다. 정말 초기화할까요?"
+    "일기, PLAN, TODO, 연간 기록이 모두 삭제됩니다. 정말 초기화할까요?"
   );
   if(!second)return;
 
@@ -2532,6 +2724,10 @@ function normalizeLoadedData(){
   data.plan.weekday.chips ??=[];
   data.plan.weekly.chips ??=[];
   data.plan.weekly.weeks ??=[];
+
+  data.annual ??={segments:[]};
+  data.annual.segments ??=[];
+  data.annual.colors ??={};
 
   data.todo ??={};
   data.todo.todo ??=[];
