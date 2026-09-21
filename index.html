@@ -462,19 +462,19 @@ button{cursor:pointer}
   padding:5px;
 }
 .schedule-add{
-  display:grid;grid-template-columns:132px 1fr 44px;gap:7px;margin-bottom:9px;
+  display:grid;grid-template-columns:132px 1fr 44px;gap:0;margin-bottom:9px;
+  border:1px solid var(--line);border-radius:11px;background:var(--surface);overflow:hidden;
 }
-.schedule-add input{
-  min-width:0;border:1px solid var(--line);background:var(--surface);
-  border-radius:11px;padding:11px 13px;outline:none;
-}
-.schedule-date{
-  flex:none;font-size:12px;color:var(--muted);min-width:44px;
-}
+.schedule-add input{min-width:0;border:0;background:transparent;border-radius:0;padding:11px 13px;outline:none}
+.schedule-add #scheduleDate{border-right:1px solid var(--line);color:var(--muted)}
+.schedule-add .plus-btn{width:44px;border-radius:0}
+.schedule-date{flex:none;font-size:12px;color:var(--muted);min-width:44px}
 @media(max-width:520px){
-  .schedule-add{grid-template-columns:118px 1fr 44px}
+  .schedule-add{grid-template-columns:112px minmax(0,1fr) 42px}
   .schedule-add input{padding:10px 9px}
+  .schedule-add .plus-btn{width:42px}
 }
+
 
 /* SETTINGS */
 
@@ -1067,6 +1067,22 @@ function scheduleDiarySave(){
 diaryText.addEventListener("input",scheduleDiarySave);
 tagInput.addEventListener("input",scheduleDiarySave);
 
+const DIARY_HEIGHT_KEY="DAY_DIARY_HEIGHT";
+function restoreDiaryHeight(){
+  const h=Number(localStorage.getItem(DIARY_HEIGHT_KEY));
+  if(Number.isFinite(h)&&h>=180) diaryText.style.height=h+"px";
+}
+let diaryResizeTimer=null;
+if("ResizeObserver" in window){
+  new ResizeObserver(entries=>{
+    const h=Math.round(entries[0]?.contentRect.height||0);
+    if(h<180)return;
+    clearTimeout(diaryResizeTimer);
+    diaryResizeTimer=setTimeout(()=>localStorage.setItem(DIARY_HEIGHT_KEY,String(h)),180);
+  }).observe(diaryText);
+}
+restoreDiaryHeight();
+
 document.getElementById("prevDay").onclick=()=>{
   selectedDate=localDateString(addDays(parseDate(selectedDate),-1));
   renderDiary();
@@ -1282,33 +1298,17 @@ function makeChip(chip,type){
   title.textContent=chip.title;
   el.appendChild(title);
 
-  const del=document.createElement("button");
-  del.type="button";
-  del.textContent="×";
-  del.setAttribute("aria-label","삭제");
-  del.style.cssText="border:0;background:none;color:#aaa;padding:0 0 0 7px;font-size:15px;line-height:1";
-  del.onclick=async e=>{
-    e.stopPropagation();
-    data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==chip.id);
-    await saveAll();
-    renderPlan();
-  };
-  el.appendChild(del);
-
-  el.onclick=async e=>{
-    if(e.target===del)return;
+  el.onclick=async()=>{
+    if(el.dataset.suppressClick==="1"){el.dataset.suppressClick="0";return;}
     chip.done=!chip.done;
     await saveAll();
     renderPlan();
   };
 
-  el.oncontextmenu=async e=>{
+  el.oncontextmenu=e=>{
     e.preventDefault();
-    if(await confirmBox("이 항목을 삭제할까요?")){
-      data.plan[type].chips=data.plan[type].chips.filter(c=>c.id!==chip.id);
-      await saveAll();
-      renderPlan();
-    }
+    el.dataset.suppressClick="1";
+    openChipMenu(chip,type,e.clientX,e.clientY);
   };
 
   el.addEventListener("dragstart",e=>{
@@ -2086,108 +2086,53 @@ document.getElementById("resetAll").onclick=async()=>{
 };
 
 /* =========================================================
-   MOBILE POINTER DRAG FOR PLAN
-   HTML5 drag fallback remains for PC.
+   PLAN TOUCH GESTURES
+   tap = complete / move = drag / long hold = delete menu
 ========================================================= */
-
 let pointerDrag=null;
-
 document.addEventListener("pointerdown",e=>{
   const chip=e.target.closest(".chip");
-  if(!chip || e.pointerType==="mouse")return;
-
-  const startX=e.clientX;
-  const startY=e.clientY;
-
-  const timer=setTimeout(()=>{
-    pointerDrag={
-      chip,
-      id:chip.dataset.id,
-      type:chip.dataset.type,
-      startX,startY,
-      moved:false
-    };
-
-    chip.style.opacity=".4";
+  if(!chip||e.pointerType==="mouse")return;
+  const startX=e.clientX,startY=e.clientY;
+  let moved=false,dragging=false,longPressed=false;
+  const longTimer=setTimeout(()=>{
+    if(moved)return;
+    longPressed=true;chip.dataset.suppressClick="1";
+    const item=data.plan[chip.dataset.type].chips.find(c=>c.id===chip.dataset.id);
+    if(item)openChipMenu(item,chip.dataset.type,startX,startY);
     if(navigator.vibrate)navigator.vibrate(25);
-  },280);
-
+  },620);
   function move(ev){
-    if(!pointerDrag){
-      if(Math.abs(ev.clientX-startX)>8 ||
-         Math.abs(ev.clientY-startY)>8){
-        clearTimeout(timer);
-      }
-      return;
+    if(!moved&&Math.hypot(ev.clientX-startX,ev.clientY-startY)>9){
+      moved=true;clearTimeout(longTimer);dragging=true;chip.dataset.suppressClick="1";
+      pointerDrag={chip,id:chip.dataset.id,type:chip.dataset.type};chip.style.opacity=".4";
     }
-
-    pointerDrag.moved=true;
-    ev.preventDefault();
-
-    const target=document
-      .elementFromPoint(ev.clientX,ev.clientY)
-      ?.closest(".drop-zone");
-
-    document.querySelectorAll(".drop-hover")
-      .forEach(x=>x.classList.remove("drop-hover"));
-
+    if(!dragging)return; ev.preventDefault();
+    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
     if(target)target.classList.add("drop-hover");
   }
-
   async function up(ev){
-    clearTimeout(timer);
-
-    document.removeEventListener("pointermove",move);
-    document.removeEventListener("pointerup",up);
-
-    if(!pointerDrag)return;
-
-    const drag=pointerDrag;
-    pointerDrag=null;
-
-    drag.chip.style.opacity="";
-
-    const target=document
-      .elementFromPoint(ev.clientX,ev.clientY)
-      ?.closest(".drop-zone");
-
-    document.querySelectorAll(".drop-hover")
-      .forEach(x=>x.classList.remove("drop-hover"));
-
-    if(!target)return;
-
+    clearTimeout(longTimer);cleanup();
+    if(longPressed||!dragging){pointerDrag=null;return;}
+    const drag=pointerDrag;pointerDrag=null;chip.style.opacity="";
+    const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop-zone");
+    document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
+    if(!target||!drag)return;
     let zone=target.dataset.zone;
-
     if(!zone){
       const week=target.closest(".week-row");
-      if(week){
-        const index=[...document.querySelectorAll(".week-row")]
-          .indexOf(week);
-        zone=data.plan.weekly.weeks[index];
-      }else{
-        const day=target.closest(".day-row");
-        if(day){
-          const index=[...document.querySelectorAll(".day-row")]
-            .indexOf(day);
-          zone=index===7 ? "any-week" : "day-"+index;
-        }
-      }
+      if(week)zone=data.plan.weekly.weeks[[...document.querySelectorAll(".week-row")].indexOf(week)];
+      else{const day=target.closest(".day-row");if(day){const i=[...document.querySelectorAll(".day-row")].indexOf(day);zone=i===7?"any-week":"day-"+i;}}
     }
-
-    if(!zone)return;
-
-    const item=data.plan[drag.type].chips
-      .find(c=>c.id===drag.id);
-
-    if(item){
-      item.zone=zone;
-      await saveAll();
-      renderPlan();
-    }
+    const item=data.plan[drag.type].chips.find(c=>c.id===drag.id);
+    if(item&&zone){item.zone=zone;await saveAll();renderPlan();}
   }
-
+  function cancel(){clearTimeout(longTimer);cleanup();if(pointerDrag?.chip)pointerDrag.chip.style.opacity="";pointerDrag=null;}
+  function cleanup(){document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",cancel);}
   document.addEventListener("pointermove",move,{passive:false});
   document.addEventListener("pointerup",up,{once:true});
+  document.addEventListener("pointercancel",cancel,{once:true});
 });
 
 /* =========================================================
