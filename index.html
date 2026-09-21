@@ -609,10 +609,18 @@ button{cursor:pointer}
 .annual-year{font-size:20px;font-weight:750;min-width:76px;text-align:center}
 .annual-add{white-space:nowrap}
 .annual-empty{padding:42px 12px;text-align:center;color:var(--muted)}
-.annual-desktop{display:block;overflow-x:auto;padding-bottom:8px}
-.annual-grid{min-width:1050px;background:transparent}
-.annual-month-head,.annual-project-row{display:grid;grid-template-columns:150px minmax(900px,1fr)}
+.annual-desktop{display:block;overflow-x:visible;padding-bottom:8px}
+.annual-grid{width:100%;min-width:0;background:transparent}
+.annual-month-head,.annual-project-row{display:grid;grid-template-columns:150px minmax(0,1fr)}
 .annual-project-name{padding:10px 14px 10px 2px;font-weight:750;display:flex;align-items:center;background:transparent}
+.annual-project-name-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(min-width:700px){
+  .annual-project-row{cursor:grab}
+  .annual-project-row:active{cursor:grabbing}
+  .annual-project-row.annual-dragging{opacity:.45}
+  .annual-project-row.annual-drop-before{box-shadow:inset 0 2px 0 rgba(129,146,123,.55)}
+  .annual-project-row.annual-drop-after{box-shadow:inset 0 -2px 0 rgba(129,146,123,.55)}
+}
 .annual-months{display:grid;grid-template-columns:repeat(12,1fr);height:38px}
 .annual-month{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);font-weight:700}
 .annual-month.current{color:#53664f;font-weight:750;background:rgba(225,231,221,.55);border-radius:8px 8px 0 0}
@@ -641,9 +649,9 @@ button{cursor:pointer}
     grid-template-columns:repeat(3,minmax(0,1fr));
     grid-template-rows:repeat(4,minmax(0,1fr));
     gap:7px;
-    height:calc(100dvh - 164px);
-    min-height:494px;
-    max-height:644px;
+    height:calc(100dvh - 134px);
+    min-height:524px;
+    max-height:674px;
   }
   .annual-head{margin-bottom:12px}
   .annual-year{font-size:18px}
@@ -677,7 +685,7 @@ button{cursor:pointer}
     line-height:0;
     padding-bottom:3px;
   }
-  #annualView{max-width:none}
+  #annualView{width:min(96vw,2220px);max-width:none;margin-left:50%;transform:translateX(-50%)}
   .nav{gap:42px}
 }
 
@@ -1926,8 +1934,25 @@ function renderPlan(){
 let annualSelectedYear=new Date().getFullYear();
 let annualEditingId=null;
 const ANNUAL_PALETTE=["#c98f86","#8fa8bd","#b39ab8","#c5a56f","#93a98e","#b88972","#8f9ab5","#c19aab"];
-function annualSegments(){data.annual??={segments:[],colors:{}};data.annual.segments??=[];data.annual.colors??={};return data.annual.segments;}
+function annualSegments(){data.annual??={segments:[],colors:{},order:[]};data.annual.segments??=[];data.annual.colors??={};data.annual.order??=[];return data.annual.segments;}
 function annualColors(){annualSegments();return data.annual.colors;}
+function annualOrder(){annualSegments();return data.annual.order;}
+function orderedAnnualProjects(segs){
+  const found=[...new Set(segs.map(s=>s.project))],order=annualOrder();
+  return [...order.filter(p=>found.includes(p)),...found.filter(p=>!order.includes(p))];
+}
+async function reorderAnnualProject(dragged,target,after,segs){
+  if(!dragged||!target||dragged===target)return;
+  const projects=orderedAnnualProjects(segs);
+  const from=projects.indexOf(dragged);if(from<0)return;
+  projects.splice(from,1);
+  let to=projects.indexOf(target);if(to<0)return;
+  if(after)to++;
+  projects.splice(to,0,dragged);
+  const visible=new Set(projects),rest=annualOrder().filter(p=>!visible.has(p));
+  data.annual.order=[...projects,...rest];
+  await saveAll();renderAnnual();
+}
 function projectColor(project){
   const colors=annualColors();
   if(colors[project])return colors[project];
@@ -1973,7 +1998,7 @@ function renderAnnual(){
 }
 function renderAnnualDesktop(segs){
   const box=document.getElementById('annualDesktop');box.innerHTML='';
-  const projects=[...new Set(segs.map(s=>s.project))];
+  const projects=orderedAnnualProjects(segs);
   if(!projects.length){box.innerHTML='<div class="annual-empty">이 해에 기록된 구간이 없습니다.</div>';return;}
   const grid=document.createElement('div');grid.className='annual-grid';
   const head=document.createElement('div');head.className='annual-month-head';head.innerHTML='<div></div>';
@@ -1984,7 +2009,16 @@ function renderAnnualDesktop(segs){
   projects.forEach(project=>{
     const row=document.createElement('div');row.className='annual-project-row';
     const color=projectColor(project);
-    const name=document.createElement('div');name.className='annual-project-name';name.textContent=project;name.style.color=annualTitleInk(color);
+    const name=document.createElement('div');name.className='annual-project-name';name.style.color=annualTitleInk(color);
+    const nameText=document.createElement('span');nameText.className='annual-project-name-text';nameText.textContent=project;name.append(nameText);
+    if(window.matchMedia('(min-width:700px)').matches){
+      row.draggable=true;row.dataset.project=project;
+      row.addEventListener('dragstart',e=>{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',project);requestAnimationFrame(()=>row.classList.add('annual-dragging'))});
+      row.addEventListener('dragend',()=>{document.querySelectorAll('.annual-project-row').forEach(r=>r.classList.remove('annual-dragging','annual-drop-before','annual-drop-after'))});
+      row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';const rect=row.getBoundingClientRect(),after=e.clientY>rect.top+rect.height/2;row.classList.toggle('annual-drop-before',!after);row.classList.toggle('annual-drop-after',after)});
+      row.addEventListener('dragleave',()=>row.classList.remove('annual-drop-before','annual-drop-after'));
+      row.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain');const rect=row.getBoundingClientRect(),after=e.clientY>rect.top+rect.height/2;row.classList.remove('annual-drop-before','annual-drop-after');reorderAnnualProject(dragged,project,after,segs)});
+    }
     const track=document.createElement('div');track.className='annual-track';appendMonthBands(track,annualSelectedYear);
     segs.filter(s=>s.project===project).forEach(seg=>{
       const c=clippedSegment(seg,annualSelectedYear),start=dayOfYear(c.start),end=dayOfYear(c.end),duration=end-start+1;
@@ -2039,10 +2073,16 @@ document.getElementById('annualSave').onclick=async()=>{
   if(!project||!start||!end){alert('제목과 시작일, 종료일을 입력해주세요.');return}if(start>end){alert('기간을 확인해주세요.');return}
   let oldProject=null;if(annualEditingId){const x=annualSegments().find(s=>s.id===annualEditingId);if(x){oldProject=x.project;Object.assign(x,{project,label,start,end})}}else annualSegments().push({id:uid(),project,label,start,end});
   annualColors()[project]=color;
-  if(oldProject&&oldProject!==project&&!annualSegments().some(s=>s.project===oldProject))delete annualColors()[oldProject];
+  if(oldProject&&oldProject!==project&&!annualSegments().some(s=>s.project===oldProject)){
+    delete annualColors()[oldProject];
+    const oi=annualOrder().indexOf(oldProject);if(oi>=0)annualOrder()[oi]=project;
+  }
   await saveAll();annualSelectedYear=Number(start.slice(0,4));closeAnnualModal();renderAnnual();
 };
-document.getElementById('annualDelete').onclick=async()=>{if(!annualEditingId)return;if(!await confirmBox('이 구간을 삭제할까요?'))return;const target=annualSegments().find(s=>s.id===annualEditingId);const project=target?.project;data.annual.segments=data.annual.segments.filter(s=>s.id!==annualEditingId);if(project&&!data.annual.segments.some(s=>s.project===project))delete annualColors()[project];closeAnnualModal();await saveAll();renderAnnual();};
+document.getElementById('annualDelete').onclick=async()=>{if(!annualEditingId)return;if(!await confirmBox('이 구간을 삭제할까요?'))return;const target=annualSegments().find(s=>s.id===annualEditingId);const project=target?.project;data.annual.segments=data.annual.segments.filter(s=>s.id!==annualEditingId);if(project&&!data.annual.segments.some(s=>s.project===project)){
+  delete annualColors()[project];
+  data.annual.order=annualOrder().filter(p=>p!==project);
+}closeAnnualModal();await saveAll();renderAnnual();};
 
 /* =========================================================
    TODO
