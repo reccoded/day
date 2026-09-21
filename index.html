@@ -701,6 +701,32 @@ button{cursor:pointer}
   }
 }
 
+
+/* MOBILE PLAN REFINEMENT */
+@media(max-width:699px){
+  /* Weekday: empty/one-chip rows stay compact so Mon-Sun fit at a glance. */
+  .day-row{min-height:48px;padding:7px 9px;align-items:center}
+  .day-label{min-height:32px}
+  .day-row .drop-zone{min-height:32px;align-items:center;align-content:center}
+  .day-row:has(.drop-zone .chip:nth-child(2)){min-height:65px;align-items:stretch}
+  .day-row:has(.drop-zone .chip:nth-child(2)) .day-label,
+  .day-row:has(.drop-zone .chip:nth-child(2)) .drop-zone{
+    min-height:49px;align-content:flex-start
+  }
+
+  /* Weekly remains a fixed two-line card. */
+  .week-row{min-height:82px}
+  .week-row>.drop-zone{min-height:60px;align-items:flex-start;align-content:flex-start}
+
+  /* Every PLAN chip has the same height. */
+  .chip{height:34px;min-height:34px;padding:6px 11px;line-height:20px;flex:none}
+  .chip>span{line-height:20px;white-space:nowrap}
+
+  /* Inner drop-zone never becomes a second highlighted target on mobile. */
+  .day-row .drop-zone.drop-hover,
+  .week-row .drop-zone.drop-hover{outline:none}
+}
+
 </style>
 </head>
 
@@ -1511,6 +1537,16 @@ function makeChip(chip,type){
   return el;
 }
 
+function nextPlanOrder(type){
+  const orders=data.plan[type].chips.map(c=>Number(c.order)||0);
+  return (orders.length?Math.max(...orders):Date.now())+1;
+}
+function planChipsInZone(type,zone){
+  return data.plan[type].chips
+    .filter(c=>c.zone===zone)
+    .sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0));
+}
+
 function enableDrop(el,type,zone){
   el.addEventListener("dragover",e=>{
     e.preventDefault();
@@ -1533,6 +1569,7 @@ function enableDrop(el,type,zone){
       if(!chip)return;
 
       chip.zone=zone;
+      chip.order=nextPlanOrder(type);
       await saveAll();
       renderPlan();
     }catch{}
@@ -1558,8 +1595,7 @@ function renderWeekday(){
   loose.innerHTML="";
   enableDrop(loose,"weekday","loose");
 
-  data.plan.weekday.chips
-    .filter(c=>c.zone==="loose")
+  planChipsInZone("weekday","loose")
     .forEach(c=>loose.appendChild(makeChip(c,"weekday")));
 
   const board=document.getElementById("weekdayBoard");
@@ -1582,8 +1618,7 @@ function renderWeekday(){
     zone.dataset.zone=zoneKey;
     enableDrop(zone,"weekday",zoneKey);
 
-    data.plan.weekday.chips
-      .filter(c=>c.zone===zoneKey)
+    planChipsInZone("weekday",zoneKey)
       .forEach(c=>zone.appendChild(makeChip(c,"weekday")));
 
     row.append(label,zone);
@@ -1611,8 +1646,7 @@ function renderWeekly(){
   loose.innerHTML="";
   enableDrop(loose,"weekly","loose");
 
-  data.plan.weekly.chips
-    .filter(c=>c.zone==="loose")
+  planChipsInZone("weekly","loose")
     .forEach(c=>loose.appendChild(makeChip(c,"weekly")));
 
   const rows=document.getElementById("weekRows");
@@ -1673,8 +1707,7 @@ function renderWeekly(){
     zone.dataset.zone=key;
     enableDrop(zone,"weekly",key);
 
-    data.plan.weekly.chips
-      .filter(c=>c.zone===key)
+    planChipsInZone("weekly",key)
       .forEach(c=>zone.appendChild(makeChip(c,"weekly")));
 
     row.append(head,zone);
@@ -2440,7 +2473,7 @@ document.addEventListener("pointerdown",e=>{
     }
     if(!dragging)return;ev.preventDefault();
     const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
-    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row,.drop-zone");
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row");
     document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
     if(target)target.classList.add("drop-hover");
   }
@@ -2448,7 +2481,7 @@ document.addEventListener("pointerdown",e=>{
     cleanup();if(!dragging){pointerDrag=null;return;}
     const drag=pointerDrag;pointerDrag=null;chip.style.opacity="";
     const rawTarget=document.elementFromPoint(ev.clientX,ev.clientY);
-    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row,.drop-zone");
+    const target=rawTarget?.closest(".plan-trash,.loose-area,.day-row,.week-row");
     document.querySelectorAll(".drop-hover").forEach(x=>x.classList.remove("drop-hover"));
     if(!target||!drag)return;
     if(target.classList.contains("plan-trash")){
@@ -2459,14 +2492,25 @@ document.addEventListener("pointerdown",e=>{
       }
       return;
     }
-    let zone=target.dataset.zone;
-    if(!zone){
-      const week=target.closest(".week-row");
-      if(week)zone=data.plan.weekly.weeks[[...document.querySelectorAll(".week-row")].indexOf(week)];
-      else{const day=target.closest(".day-row");if(day){const i=[...document.querySelectorAll(".day-row")].indexOf(day);zone=i===7?"any-week":"day-"+i;}}
+    let zone=null;
+    if(target.classList.contains("loose-area")){
+      zone="loose";
+    }else if(target.classList.contains("week-row")){
+      if(drag.type!=="weekly")return;
+      const i=[...document.querySelectorAll("#weekRows .week-row")].indexOf(target);
+      zone=data.plan.weekly.weeks[i];
+    }else if(target.classList.contains("day-row")){
+      if(drag.type!=="weekday")return;
+      const i=[...document.querySelectorAll("#weekdayBoard .day-row")].indexOf(target);
+      zone=i===7?"any-week":"day-"+i;
     }
     const item=data.plan[drag.type].chips.find(c=>c.id===drag.id);
-    if(item&&zone){item.zone=zone;await saveAll();renderPlan();}
+    if(item&&zone){
+      item.zone=zone;
+      item.order=nextPlanOrder(drag.type);
+      await saveAll();
+      renderPlan();
+    }
   }
   function cancel(){cleanup();if(pointerDrag?.chip)pointerDrag.chip.style.opacity="";pointerDrag=null;}
   function cleanup(){document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",cancel);}
