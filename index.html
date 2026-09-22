@@ -627,8 +627,8 @@ button{cursor:pointer}
   .annual-project-row.annual-drop-before{box-shadow:inset 0 2px 0 rgba(129,146,123,.55)}
   .annual-project-row.annual-drop-after{box-shadow:inset 0 -2px 0 rgba(129,146,123,.55)}
 }
-.annual-months{display:grid;grid-template-columns:repeat(12,1fr);height:38px}
-.annual-month{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);font-weight:700}
+.annual-months{position:relative;height:38px}
+.annual-month{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);font-weight:700}
 .annual-month.current{color:#53664f;font-weight:750;background:rgba(225,231,221,.55);border-radius:8px 8px 0 0}
 .annual-project-row{min-height:58px}
 .annual-track{position:relative;min-height:58px}
@@ -2097,7 +2097,7 @@ function renderAnnualDesktop(segs){
   const grid=document.createElement('div');grid.className='annual-grid';
   const head=document.createElement('div');head.className='annual-month-head';head.innerHTML='<div></div>';
   const months=document.createElement('div');months.className='annual-months';
-  const now=new Date();for(let m=0;m<12;m++){const el=document.createElement('div');el.className='annual-month'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');el.textContent=(m+1)+'월';months.appendChild(el)}
+  const now=new Date(),headTotal=daysInYear(annualSelectedYear);for(let m=0;m<12;m++){const el=document.createElement('div');el.className='annual-month'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');el.textContent=(m+1)+'월';const start=dayOfYear(`${annualSelectedYear}-${pad(m+1)}-01`),end=m===11?headTotal:dayOfYear(`${annualSelectedYear}-${pad(m+2)}-01`);el.style.left=(start/headTotal*100)+'%';el.style.width=((end-start)/headTotal*100)+'%';months.appendChild(el)}
   head.appendChild(months);grid.appendChild(head);
   const total=daysInYear(annualSelectedYear);
   projects.forEach(project=>{
