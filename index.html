@@ -223,6 +223,11 @@ button{cursor:pointer}
   cursor:pointer;
 }
 .search-result-date{font-weight:650;margin-bottom:4px}
+@media(max-width:699px){
+  #searchResults.list-mode .search-result-date{
+    font-weight:500;
+  }
+}
 .search-preview{
   font-size:14px;
   color:#55564f;
@@ -1579,6 +1584,7 @@ function runSearch(){
     .value.trim().toLowerCase();
 
   const box=document.getElementById("searchResults");
+  box.classList.toggle("list-mode",searchMode==="list");
   box.innerHTML="";
 
   if(!q && searchMode!=="list")return;
