@@ -773,10 +773,14 @@ button{cursor:pointer}
 .settings-card h3{
   font-size:14px;margin:0 0 12px;
 }
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 10px}
 .stat{
-  display:flex;justify-content:space-between;
-  padding:6px 0;font-size:14px;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 10px;font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:9px;
 }
+.tag-preset-item[draggable="true"]{cursor:grab}
+.tag-preset-item.dragging{opacity:.45}
+.tag-preset-item.drag-over{outline:2px solid var(--accent);outline-offset:2px}
 .setting-buttons{
   display:flex;flex-wrap:wrap;gap:7px;
 }
@@ -903,6 +907,7 @@ button{cursor:pointer}
       <button id="searchTitleBtn" class="active">제목</button>
       <button id="searchContentBtn">본문</button>
       <button id="searchTagBtn">태그</button>
+      <button id="searchListBtn">목록</button>
     </div>
     <input class="search-input" id="searchInput" placeholder="검색">
     <div id="searchResults"></div>
@@ -1054,10 +1059,22 @@ button{cursor:pointer}
 
     <div class="settings-card">
       <h3>데이터 현황</h3>
-      <div class="stat"><span>전체 일기</span><b id="statDiaryAll">0</b></div>
-      <div class="stat"><span>올해 일기</span><b id="statDiaryYear">0</b></div>
-      <div class="stat"><span>전체 TODO</span><b id="statTodoAll">0</b></div>
-      <div class="stat"><span>올해 TODO</span><b id="statTodoYear">0</b></div>
+      <div class="stat-grid">
+        <div class="stat"><span>올해 일기</span><b id="statDiaryYear">0</b></div>
+        <div class="stat"><span>전체 일기</span><b id="statDiaryAll">0</b></div>
+        <div class="stat"><span>올해 TODO</span><b id="statTodoYear">0</b></div>
+        <div class="stat"><span>전체 TODO</span><b id="statTodoAll">0</b></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>전체 데이터</h3>
+      <div class="setting-buttons">
+        <button class="soft-btn" id="jsonBackup">백업</button>
+        <button class="soft-btn" id="jsonRestoreBtn">복원</button>
+        <button class="danger-btn" id="resetAll">초기화</button>
+        <input type="file" accept=".json,application/json" id="jsonRestoreInput" class="hidden">
+      </div>
     </div>
 
     <div class="settings-card">
@@ -1067,17 +1084,7 @@ button{cursor:pointer}
         <input id="tagPresetInput" placeholder="새 태그">
         <button class="primary-btn" id="tagPresetAdd">추가</button>
       </div>
-      <div class="small" style="margin-top:8px">수정·삭제하면 기존 일기의 같은 태그에도 적용됩니다.</div>
-    </div>
-
-    <div class="settings-card">
-      <h3>전체 데이터</h3>
-      <div class="setting-buttons">
-        <button class="soft-btn" id="jsonBackup">JSON 백업</button>
-        <button class="soft-btn" id="jsonRestoreBtn">JSON 복원</button>
-        <input type="file" accept=".json,application/json"
-          id="jsonRestoreInput" class="hidden">
-      </div>
+      <div class="small" style="margin-top:8px">드래그해서 순서를 바꿀 수 있습니다. 모바일에서는 ↑ ↓ 버튼을 사용하세요.</div>
     </div>
 
     <div class="settings-card">
@@ -1096,10 +1103,6 @@ button{cursor:pointer}
         <input type="date" id="todoExportTo">
       </div>
       <button class="soft-btn" id="todoExport">MD 내보내기</button>
-    </div>
-
-    <div class="danger-zone">
-      <button class="danger-btn" id="resetAll">전체 초기화</button>
     </div>
   </div>
 </div>
@@ -1558,12 +1561,16 @@ function setSearchMode(mode){
   document.getElementById("searchTitleBtn").classList.toggle("active",mode==="title");
   document.getElementById("searchContentBtn").classList.toggle("active",mode==="content");
   document.getElementById("searchTagBtn").classList.toggle("active",mode==="tag");
+  document.getElementById("searchListBtn").classList.toggle("active",mode==="list");
+  const input=document.getElementById("searchInput");
+  input.classList.toggle("hidden",mode==="list");
   runSearch();
 }
 
 document.getElementById("searchTitleBtn").onclick=()=>setSearchMode("title");
 document.getElementById("searchContentBtn").onclick=()=>setSearchMode("content");
 document.getElementById("searchTagBtn").onclick=()=>setSearchMode("tag");
+document.getElementById("searchListBtn").onclick=()=>setSearchMode("list");
 
 document.getElementById("searchInput").oninput=runSearch;
 
@@ -1574,10 +1581,13 @@ function runSearch(){
   const box=document.getElementById("searchResults");
   box.innerHTML="";
 
-  if(!q)return;
+  if(!q && searchMode!=="list")return;
 
   const results=Object.entries(data.diaries)
     .filter(([date,e])=>{
+      if(searchMode==="list"){
+        return (e.title||"").trim()||(e.text||"").trim()||(e.tags||[]).length;
+      }
       if(searchMode==="title"){
         return (e.title||"").toLowerCase().includes(q);
       }
@@ -1604,7 +1614,8 @@ function runSearch(){
     tags.className="tagline";
     tags.textContent=(e.tags||[]).map(t=>"#"+t).join(" ");
 
-    div.append(d,p,tags);
+    if(searchMode==="list") div.append(d);
+    else div.append(d,p,tags);
 
     div.onclick=()=>{
       selectedDate=date;
@@ -2628,56 +2639,53 @@ function renderTagPresetSettings(){
   const box=document.getElementById("tagPresetList");
   if(!box)return;
   box.innerHTML="";
+  let dragIndex=null;
   getTagPresets().forEach((tag,index)=>{
     const row=document.createElement("div");
     row.className="tag-preset-item";
+    row.draggable=true;
     const input=document.createElement("input");
     input.value=tag;
     const actions=document.createElement("div");
     actions.className="tag-preset-actions";
-    const save=document.createElement("button");
-    save.textContent="수정";
-    const del=document.createElement("button");
-    del.textContent="삭제";
-    del.className="preset-delete";
+    const up=document.createElement("button"); up.textContent="↑"; up.title="위로";
+    const down=document.createElement("button"); down.textContent="↓"; down.title="아래로";
+    const save=document.createElement("button"); save.textContent="수정";
+    const del=document.createElement("button"); del.textContent="삭제"; del.className="preset-delete";
+
+    async function movePreset(to){
+      if(to<0||to>=data.tagPresets.length||to===index)return;
+      const [moved]=data.tagPresets.splice(index,1);
+      data.tagPresets.splice(to,0,moved);
+      await saveAll(); renderDiary(); renderTagPresetSettings();
+    }
+    up.onclick=()=>movePreset(index-1);
+    down.onclick=()=>movePreset(index+1);
+    up.disabled=index===0; down.disabled=index===getTagPresets().length-1;
+
+    row.addEventListener("dragstart",e=>{dragIndex=index;row.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
+    row.addEventListener("dragend",()=>{dragIndex=null;row.classList.remove("dragging");box.querySelectorAll(".drag-over").forEach(x=>x.classList.remove("drag-over"));});
+    row.addEventListener("dragover",e=>{e.preventDefault();if(dragIndex!==null&&dragIndex!==index)row.classList.add("drag-over");});
+    row.addEventListener("dragleave",()=>row.classList.remove("drag-over"));
+    row.addEventListener("drop",async e=>{e.preventDefault();row.classList.remove("drag-over");if(dragIndex===null||dragIndex===index)return;const [moved]=data.tagPresets.splice(dragIndex,1);let to=index;if(dragIndex<index)to--;data.tagPresets.splice(to,0,moved);await saveAll();renderDiary();renderTagPresetSettings();});
 
     save.onclick=async()=>{
       const next=input.value.trim();
       if(!next||next===tag)return;
-      if(getTagPresets().includes(next)){
-        alert("이미 있는 태그입니다.");
-        input.value=tag;
-        return;
-      }
-      Object.values(data.diaries).forEach(entry=>{
-        if(Array.isArray(entry.tags)){
-          entry.tags=[...new Set(entry.tags.map(t=>t===tag?next:t))];
-        }
-      });
+      if(getTagPresets().includes(next)){alert("이미 있는 태그입니다.");input.value=tag;return;}
+      Object.values(data.diaries).forEach(entry=>{if(Array.isArray(entry.tags))entry.tags=[...new Set(entry.tags.map(t=>t===tag?next:t))];});
       data.tagPresets[index]=next;
       if(activeQuickTags.delete(tag)) activeQuickTags.add(next);
-      await saveAll();
-      renderDiary();
-      renderTagPresetSettings();
+      await saveAll(); renderDiary(); renderTagPresetSettings();
     };
-
     del.onclick=async()=>{
-      Object.values(data.diaries).forEach(entry=>{
-        if(Array.isArray(entry.tags)) entry.tags=entry.tags.filter(t=>t!==tag);
-      });
-      data.tagPresets.splice(index,1);
-      activeQuickTags.delete(tag);
-      await saveAll();
-      renderDiary();
-      renderTagPresetSettings();
+      Object.values(data.diaries).forEach(entry=>{if(Array.isArray(entry.tags))entry.tags=entry.tags.filter(t=>t!==tag);});
+      data.tagPresets.splice(index,1); activeQuickTags.delete(tag);
+      await saveAll(); renderDiary(); renderTagPresetSettings();
     };
-
-    actions.append(save,del);
-    row.append(input,actions);
-    box.appendChild(row);
+    actions.append(up,down,save,del); row.append(input,actions); box.appendChild(row);
   });
 }
-
 document.getElementById("tagPresetAdd").onclick=async()=>{
   const input=document.getElementById("tagPresetInput");
   const tag=input.value.trim();
@@ -2701,7 +2709,7 @@ function updateStats(){
   const year=String(new Date().getFullYear());
 
   const diaryDates=Object.entries(data.diaries)
-    .filter(([,entry])=>(entry?.text||"").trim())
+    .filter(([,entry])=>(entry?.title||"").trim()||(entry?.text||"").trim()||(entry?.tags||[]).length)
     .map(([date])=>date);
   const completed=data.todo.completed;
 
