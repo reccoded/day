@@ -137,6 +137,20 @@ button{cursor:pointer}
   padding:5px 8px;
 }
 
+.diary-title{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:12px 14px;
+  margin-bottom:10px;
+  outline:none;
+  font-size:16px;
+  font-weight:650;
+  box-shadow:var(--shadow);
+}
+.diary-title:focus{border-color:#bdc7b8}
+
 .diary-text{
   width:100%;
   min-height:55vh;
@@ -886,7 +900,8 @@ button{cursor:pointer}
 
   <div id="searchPanel" class="search-panel hidden">
     <div class="segment">
-      <button id="searchContentBtn" class="active">내용</button>
+      <button id="searchTitleBtn" class="active">제목</button>
+      <button id="searchContentBtn">본문</button>
       <button id="searchTagBtn">태그</button>
     </div>
     <input class="search-input" id="searchInput" placeholder="검색">
@@ -894,6 +909,7 @@ button{cursor:pointer}
   </div>
 
   <div id="diaryEditor">
+    <input id="diaryTitle" class="diary-title" type="text" placeholder="제목" autocomplete="off">
     <textarea id="diaryText" class="diary-text"
       placeholder="오늘의 기록을 남겨보세요."></textarea>
 
@@ -1382,8 +1398,9 @@ document.querySelectorAll("[data-main]").forEach(btn=>{
 
 let selectedDate=localDateString();
 let diaryTimer=null;
-let searchMode="content";
+let searchMode="title";
 
+const diaryTitle=document.getElementById("diaryTitle");
 const diaryText=document.getElementById("diaryText");
 const tagInput=document.getElementById("tagInput");
 const DEFAULT_TAG_PRESETS=["일상","일정","업무","특별","생각"];
@@ -1418,6 +1435,7 @@ function renderDiary(){
     formatKoreanDate(selectedDate);
 
   const entry=data.diaries[selectedDate]||{};
+  diaryTitle.value=entry.title||"";
   diaryText.value=entry.text||"";
   const tags=entry.tags||[];
   const presets=getTagPresets();
@@ -1428,6 +1446,7 @@ function renderDiary(){
 }
 
 async function saveDiary(){
+  const title=diaryTitle.value;
   const text=diaryText.value;
   const customTags=tagInput.value
     .split(",")
@@ -1435,10 +1454,11 @@ async function saveDiary(){
     .filter(Boolean);
   const tags=[...activeQuickTags,...customTags.filter(t=>!activeQuickTags.has(t))];
 
-  if(!text.trim() && !tags.length){
+  if(!title.trim() && !text.trim() && !tags.length){
     delete data.diaries[selectedDate];
   }else{
     data.diaries[selectedDate]={
+      title,
       text,
       tags,
       updatedAt:Date.now()
@@ -1459,6 +1479,7 @@ function scheduleDiarySave(){
   diaryTimer=setTimeout(saveDiary,450);
 }
 
+diaryTitle.addEventListener("input",scheduleDiarySave);
 diaryText.addEventListener("input",scheduleDiarySave);
 tagInput.addEventListener("input",scheduleDiarySave);
 
@@ -1532,19 +1553,17 @@ document.getElementById("searchToggle").onclick=()=>{
   }
 };
 
-document.getElementById("searchContentBtn").onclick=()=>{
-  searchMode="content";
-  document.getElementById("searchContentBtn").classList.add("active");
-  document.getElementById("searchTagBtn").classList.remove("active");
+function setSearchMode(mode){
+  searchMode=mode;
+  document.getElementById("searchTitleBtn").classList.toggle("active",mode==="title");
+  document.getElementById("searchContentBtn").classList.toggle("active",mode==="content");
+  document.getElementById("searchTagBtn").classList.toggle("active",mode==="tag");
   runSearch();
-};
+}
 
-document.getElementById("searchTagBtn").onclick=()=>{
-  searchMode="tag";
-  document.getElementById("searchTagBtn").classList.add("active");
-  document.getElementById("searchContentBtn").classList.remove("active");
-  runSearch();
-};
+document.getElementById("searchTitleBtn").onclick=()=>setSearchMode("title");
+document.getElementById("searchContentBtn").onclick=()=>setSearchMode("content");
+document.getElementById("searchTagBtn").onclick=()=>setSearchMode("tag");
 
 document.getElementById("searchInput").oninput=runSearch;
 
@@ -1559,7 +1578,9 @@ function runSearch(){
 
   const results=Object.entries(data.diaries)
     .filter(([date,e])=>{
-      if(!(e.text||"").trim()) return false;
+      if(searchMode==="title"){
+        return (e.title||"").toLowerCase().includes(q);
+      }
       if(searchMode==="content"){
         return (e.text||"").toLowerCase().includes(q);
       }
@@ -1573,7 +1594,7 @@ function runSearch(){
 
     const d=document.createElement("div");
     d.className="search-result-date";
-    d.textContent=date;
+    d.textContent=e.title?`${date} · ${e.title}`:date;
 
     const p=document.createElement("div");
     p.className="search-preview";
@@ -2779,7 +2800,10 @@ document.getElementById("diaryExport").onclick=()=>{
 
   const dates=Object.keys(data.diaries)
     .filter(d=>d>=from&&d<=to)
-    .filter(d=>(data.diaries[d]?.text||"").trim())
+    .filter(d=>{
+      const e=data.diaries[d]||{};
+      return (e.title||"").trim()||(e.text||"").trim()||(e.tags||[]).length;
+    })
     .sort();
 
   let md="";
@@ -2787,7 +2811,8 @@ document.getElementById("diaryExport").onclick=()=>{
   dates.forEach(date=>{
     const e=data.diaries[date];
 
-    md+=`### ${date}\n\n`;
+    md+=`## ${date}\n\n`;
+    if((e.title||"").trim()) md+=`### ${e.title.trim()}\n\n`;
     if(e.text) md+=`${e.text.trim()}\n\n`;
 
     if(e.tags?.length){
