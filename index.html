@@ -223,7 +223,7 @@ button{cursor:pointer}
   cursor:pointer;
 }
 .search-result-date{font-weight:650;margin-bottom:4px}
-@media(max-width:699px){
+@media(max-width:699px){.idea-modal-bg{align-items:flex-end;padding:0}.idea-modal{border-radius:22px 22px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom))}
   #searchResults.list-mode .search-result-date{
     font-weight:500;
   }
@@ -882,7 +882,44 @@ button{cursor:pointer}
   .week-row .drop-zone.drop-hover{outline:none}
 }
 
+
+/* IDEA */
+#ideaView{width:min(96vw,1500px);max-width:none;margin-left:50%;transform:translateX(-50%);padding:18px 14px 60px}
+.idea-compose,.idea-tools,.idea-entry{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.idea-compose{padding:14px;margin-bottom:12px}.idea-meta{display:grid;grid-template-columns:170px minmax(150px,1fr) auto;gap:8px;align-items:end;margin-bottom:9px}
+.idea-field label,.idea-compose>label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 5px}
+#ideaView input[type=date],#ideaView input[type=search],#ideaView input[type=text],#ideaView select,#ideaView textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit;padding:10px 11px;outline:none}
+#ideaView input:focus,#ideaView select:focus,#ideaView textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(107,124,92,.10)}
+#ideaText{min-height:96px;resize:vertical;line-height:1.55;font-size:16px}.idea-ai{height:42px;display:flex!important;align-items:center;gap:7px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);white-space:nowrap;font-size:14px!important;color:var(--text)!important;margin:0!important}.idea-ai input{width:18px;height:18px;accent-color:var(--accent)}
+.idea-actions{display:flex;justify-content:flex-end;margin-top:9px}.idea-status{min-height:18px;margin:7px 2px 0;color:var(--muted);font-size:12px}.idea-btn{border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--text);padding:8px 11px;font:inherit;font-weight:700;cursor:pointer}.idea-btn.danger{color:#a75249}.idea-tools{padding:10px;margin-bottom:12px}.idea-filter-row{display:grid;grid-template-columns:minmax(160px,1fr) 140px 120px 120px auto 40px;gap:7px;align-items:center}.idea-year{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;border:1px solid var(--line);border-radius:9px;background:var(--bg);font-size:13px;font-weight:700;white-space:nowrap}.idea-year input{width:17px;height:17px;accent-color:var(--accent)}.idea-settings-btn{width:40px;height:40px;padding:0;font-size:17px}.idea-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.idea-entry{padding:12px 13px;cursor:pointer;min-width:0}.idea-entry:hover{border-color:#b9b4a6}.idea-entry-head{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:6px}.idea-cat{font-weight:800;color:var(--accent)}.idea-ai-mark{font-weight:800;color:#8b5a47}.idea-entry-actions{display:flex;gap:4px;margin-left:auto}.idea-entry-actions button{border:0;background:transparent;color:var(--muted);padding:3px 4px;cursor:pointer;font-size:12px}.idea-entry-text{white-space:pre-wrap;word-break:break-word;line-height:1.5;font-size:15px}.idea-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 12px}
+.idea-modal-bg{position:fixed;inset:0;z-index:360;background:rgba(30,30,25,.28);display:flex;align-items:center;justify-content:center;padding:20px}.idea-modal-bg.hidden{display:none!important}.idea-modal{width:min(100%,620px);max-height:88vh;overflow:auto;background:var(--bg);border-radius:22px;padding:18px 16px}.idea-cat-list{display:grid;gap:7px;margin:10px 0}.idea-cat-row{display:flex;gap:7px}.idea-cat-row input{flex:1}.idea-addcat{display:flex;gap:7px}.idea-addcat input{flex:1}.idea-data-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:14px}.idea-data-export{grid-template-columns:repeat(2,1fr);margin-top:7px}
+.idea-random-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}.idea-random-meta{font-size:12px;color:var(--muted);margin-bottom:9px}.idea-random-text{font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:break-word}.idea-random-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
+@media(max-width:900px){.idea-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:699px){.nav{gap:14px}.nav button{font-size:12px}#ideaRandomBtn{width:34px}.idea-list{grid-template-columns:1fr}#ideaView{width:100%;margin-left:0;transform:none;padding:11px 9px 45px}.idea-compose{padding:11px}.idea-meta{grid-template-columns:minmax(125px,1.5fr) minmax(78px,.9fr) auto;gap:6px}.idea-filter-row{grid-template-columns:1fr 1fr 40px}.idea-filter-row #ideaSearch{grid-column:1/3}.idea-filter-row #ideaFilterCat{grid-column:1}.idea-filter-row #ideaFilterAI{grid-column:2}.idea-filter-row #ideaSort{grid-column:1}.idea-filter-row .idea-year{grid-column:2}.idea-filter-row #ideaSettingsBtn{grid-column:3;grid-row:1}.idea-data-actions{grid-template-columns:repeat(3,1fr)}}
 </style>
+
+<style id="idea-pc-wide-adjust">
+@media (min-width:900px){
+  #ideaView{
+    width:min(96vw,2220px);
+    max-width:none;
+    margin-left:50%;
+    transform:translateX(-50%);
+  }
+  #ideaView .idea-list{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  #ideaView .idea-year{
+    min-width:calc(120px + 1em);
+  }
+}
+@media (min-width:1600px){
+  #ideaView .idea-list{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -892,6 +929,7 @@ button{cursor:pointer}
     <button data-main="day">DAY</button>
     <button data-main="plan" class="active">PLAN</button>
     <button data-main="todo">TODO</button>
+    <button data-main="idea">IDEA</button>
     <button data-main="annual">YEAR</button>
   </nav>
   <button class="icon-btn" id="settingsBtn" aria-label="설정">⚙</button>
@@ -1001,6 +1039,32 @@ button{cursor:pointer}
 </section>
 
 
+<!-- IDEA -->
+<section id="ideaView" class="view">
+  <div class="idea-compose">
+    <div class="idea-meta">
+      <div class="idea-field"><label>날짜</label><input id="ideaDate" type="date"></div>
+      <div class="idea-field"><label>분류</label><select id="ideaCategory"></select></div>
+      <label class="idea-ai"><input id="ideaAI" type="checkbox"> AI</label>
+    </div>
+    <label>IDEA</label>
+    <textarea id="ideaText" placeholder="오늘의 컨셉을 기록하세요."></textarea>
+    <div class="idea-actions"><button class="idea-btn" id="ideaCancel" style="display:none">새 IDEA</button></div>
+    <div class="idea-status" id="ideaStatus"></div>
+  </div>
+  <div class="idea-tools">
+    <div class="idea-filter-row">
+      <input id="ideaSearch" type="search" placeholder="기록 검색">
+      <select id="ideaFilterCat"><option value="">전체 분류</option></select>
+      <select id="ideaFilterAI"><option value="">전체 출처</option><option value="human">직접</option><option value="ai">AI</option></select>
+      <select id="ideaSort"><option value="new">최신순</option><option value="old">오래된순</option></select>
+      <label class="idea-year"><input id="ideaThisYear" type="checkbox" checked> 올해만</label>
+      <button class="idea-btn idea-settings-btn" id="ideaRandomBtn" aria-label="랜덤 IDEA" title="랜덤 IDEA">⚄</button>
+    </div>
+  </div>
+  <div class="idea-list" id="ideaList"></div>
+</section>
+
 <!-- ANNUAL -->
 <section id="annualView" class="view">
   <div class="annual-wrap">
@@ -1062,6 +1126,14 @@ button{cursor:pointer}
 </main>
 
 <!-- SETTINGS -->
+
+<div id="ideaRandomModal" class="idea-modal-bg hidden">
+  <div class="idea-modal">
+    <div class="modal-head"><h2>랜덤 IDEA</h2><button class="icon-btn" id="ideaRandomClose">×</button></div>
+    <div id="ideaRandomBody"></div>
+  </div>
+</div>
+
 <div id="settingsModal" class="modal-bg hidden">
   <div class="settings">
     <div class="modal-head">
@@ -1076,6 +1148,8 @@ button{cursor:pointer}
         <div class="stat"><span>전체 일기</span><b id="statDiaryAll">0</b></div>
         <div class="stat"><span>올해 TODO</span><b id="statTodoYear">0</b></div>
         <div class="stat"><span>전체 TODO</span><b id="statTodoAll">0</b></div>
+        <div class="stat"><span>올해 IDEA</span><b id="statIdeaYear">0</b></div>
+        <div class="stat"><span>전체 IDEA</span><b id="statIdeaAll">0</b></div>
       </div>
     </div>
 
@@ -1084,6 +1158,7 @@ button{cursor:pointer}
       <div class="setting-buttons">
         <button class="soft-btn" id="jsonBackup">백업</button>
         <button class="soft-btn" id="jsonRestoreBtn">복원</button>
+        <button class="soft-btn" id="csvExport">CSV</button>
         <button class="danger-btn" id="resetAll">초기화</button>
         <input type="file" accept=".json,application/json" id="jsonRestoreInput" class="hidden">
       </div>
@@ -1097,6 +1172,15 @@ button{cursor:pointer}
         <button class="primary-btn" id="tagPresetAdd">추가</button>
       </div>
       
+    </div>
+
+    <div class="settings-card">
+      <h3>IDEA 분류 프리셋</h3>
+      <div id="ideaCatList" class="tag-preset-list"></div>
+      <div class="tag-preset-add">
+        <input id="ideaNewCat" placeholder="새 분류">
+        <button class="primary-btn" id="ideaAddCat">추가</button>
+      </div>
     </div>
 
     <div class="settings-card">
@@ -1115,6 +1199,15 @@ button{cursor:pointer}
         <input type="date" id="todoExportTo">
       </div>
       <button class="soft-btn" id="todoExport">MD 내보내기</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>IDEA MD 내보내기</h3>
+      <div class="export-row">
+        <input type="date" id="ideaExportFrom">
+        <input type="date" id="ideaExportTo">
+      </div>
+      <button class="soft-btn" id="ideaExport">MD 내보내기</button>
     </div>
   </div>
 </div>
@@ -1214,6 +1307,11 @@ const defaultData={
   version:1,
   diaries:{},
   tagPresets:["일상","일정","업무","특별","생각"],
+  idea:{
+    categories:["컨셉","소재","생각","대사"].map((name,i)=>({id:"idea-cat-"+(i+1),name})),
+    entries:[],
+    settings:{thisYear:true}
+  },
 
   plan:{
     weekday:{
@@ -1404,6 +1502,7 @@ document.querySelectorAll("[data-main]").forEach(btn=>{
       .classList.add("active");
 
     if(btn.dataset.main==="todo") renderTodo();
+    if(btn.dataset.main==="idea" && window.renderIdea) window.renderIdea();
     if(btn.dataset.main==="plan") renderPlan();
     if(btn.dataset.main==="annual") renderAnnual();
   };
@@ -2632,6 +2731,7 @@ document.getElementById("settingsBtn").onclick=()=>{
   updateStats();
   setDefaultExportDates();
   renderTagPresetSettings();
+  if(window.renderIdeaCategorySettings) window.renderIdeaCategorySettings();
   settingsModal.classList.remove("hidden");
 };
 
@@ -2735,16 +2835,20 @@ function updateStats(){
 
   document.getElementById("statTodoYear").textContent=
     completed.filter(x=>x.completedDate.startsWith(year+"-")).length;
+
+  const ideaEntries=data.idea?.entries||[];
+  document.getElementById("statIdeaAll").textContent=ideaEntries.length;
+  document.getElementById("statIdeaYear").textContent=ideaEntries.filter(x=>String(x.date||"").startsWith(year+"-")).length;
 }
 
 function setDefaultExportDates(){
   const year=new Date().getFullYear();
 
-  ["diaryExportFrom","todoExportFrom"].forEach(id=>{
+  ["diaryExportFrom","todoExportFrom","ideaExportFrom"].forEach(id=>{
     document.getElementById(id).value=`${year}-01-01`;
   });
 
-  ["diaryExportTo","todoExportTo"].forEach(id=>{
+  ["diaryExportTo","todoExportTo","ideaExportTo"].forEach(id=>{
     document.getElementById(id).value=`${year}-12-31`;
   });
 }
@@ -2770,6 +2874,36 @@ document.getElementById("jsonBackup").onclick=()=>{
 
 document.getElementById("jsonRestoreBtn").onclick=()=>{
   document.getElementById("jsonRestoreInput").click();
+};
+
+document.getElementById("csvExport").onclick=()=>{
+  const diaryCountByDate={};
+  Object.entries(data.diaries||{}).forEach(([date,entry])=>{
+    if(!date)return;
+    const hasDiary=(entry?.title||"").trim()||(entry?.text||"").trim()||(entry?.tags||[]).length;
+    if(hasDiary) diaryCountByDate[date]=(diaryCountByDate[date]||0)+1;
+  });
+
+  const todoCountByDate={};
+  (data.todo?.completed||[]).forEach(item=>{
+    const date=item?.completedDate;
+    if(date) todoCountByDate[date]=(todoCountByDate[date]||0)+1;
+  });
+
+  const ideaCountByDate={};
+  (data.idea?.entries||[]).forEach(item=>{
+    const date=item?.date;
+    if(date) ideaCountByDate[date]=(ideaCountByDate[date]||0)+1;
+  });
+
+  const dates=[...new Set([...Object.keys(diaryCountByDate),...Object.keys(todoCountByDate),...Object.keys(ideaCountByDate)])].sort();
+  const rows=[["날짜","일기 개수","완료한 할 일 개수","IDEA 개수"],...dates.map(date=>[date,diaryCountByDate[date]||0,todoCountByDate[date]||0,ideaCountByDate[date]||0])];
+  const csv="\uFEFF"+rows.map(row=>row.map(value=>{
+    const text=String(value??"");
+    return /[",\n]/.test(text)?`"${text.replace(/"/g,'""')}"`:text;
+  }).join(",")).join("\r\n");
+
+  downloadText(`DAY_summary_${localDateString()}.csv`,csv,"text/csv;charset=utf-8");
 };
 
 document.getElementById("jsonRestoreInput").onchange=async e=>{
@@ -2892,7 +3026,7 @@ document.getElementById("resetAll").onclick=async()=>{
   if(!first)return;
 
   const second=await confirmBox(
-    "일기, PLAN, TODO, 연간 기록이 모두 삭제됩니다. 정말 초기화할까요?"
+    "일기, PLAN, TODO, IDEA, 연간 기록이 모두 삭제됩니다. 정말 초기화할까요?"
   );
   if(!second)return;
 
@@ -3026,6 +3160,11 @@ document.addEventListener("pointerdown",e=>{
 function normalizeLoadedData(){
   data.diaries ??={};
   if(!Array.isArray(data.tagPresets)) data.tagPresets=[...DEFAULT_TAG_PRESETS];
+  data.idea ??={};
+  if(!Array.isArray(data.idea.categories)||!data.idea.categories.length) data.idea.categories=["컨셉","소재","생각","대사"].map((name,i)=>({id:"idea-cat-"+(i+1),name}));
+  if(!Array.isArray(data.idea.entries)) data.idea.entries=[];
+  data.idea.settings ??={thisYear:true};
+  if(data.idea.settings.thisYear===undefined) data.idea.settings.thisYear=true;
   data.plan ??={};
   data.plan.weekday ??={chips:[]};
   data.plan.weekly ??={chips:[],weeks:[]};
@@ -3070,6 +3209,39 @@ function renderAll(){
   renderAll();
 
   /* PLAN is deliberately the default screen */
+})();
+
+
+/* =========================================================
+   IDEA
+========================================================= */
+(function(){
+"use strict";
+const el=id=>document.getElementById(id);
+const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+let editing=null,timer=null,saving=false;
+function cats(){return data.idea.categories} function entries(){return data.idea.entries}
+function catName(id){return cats().find(c=>c.id===id)?.name||"미분류"}
+function status(t){el("ideaStatus").textContent=t||"";if(t)setTimeout(()=>{if(el("ideaStatus").textContent===t)el("ideaStatus").textContent=""},2200)}
+function renderCats(){const cur=el("ideaCategory").value;el("ideaCategory").innerHTML=cats().map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");if(cats().some(c=>c.id===cur))el("ideaCategory").value=cur;el("ideaFilterCat").innerHTML='<option value="">전체 분류</option>'+cats().map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");}
+function filtered(){const q=el("ideaSearch").value.trim().toLowerCase(),c=el("ideaFilterCat").value,a=el("ideaFilterAI").value,old=el("ideaSort").value==="old",thisYear=el("ideaThisYear").checked,year=String(new Date().getFullYear());return entries().filter(e=>(!thisYear||String(e.date).startsWith(year+"-"))&&(!q||String(e.text).toLowerCase().includes(q))&&(!c||e.categoryId===c)&&(!a||(a==="ai"?!!e.ai:!e.ai))).sort((x,y)=>{const d=String(x.date).localeCompare(String(y.date)),t=(x.createdAt||0)-(y.createdAt||0);return old?(d||t):-(d||t)});}
+function render(){const list=filtered();el("ideaList").innerHTML=list.length?list.map(e=>`<article class="idea-entry" data-edit="${esc(e.id)}"><div class="idea-entry-head"><span>${esc(e.date)}</span><span class="idea-cat">[${esc(catName(e.categoryId))}]</span>${e.ai?'<span class="idea-ai-mark">(AI)</span>':''}<span class="idea-entry-actions"><button data-editbtn="${esc(e.id)}">수정</button><button data-del="${esc(e.id)}">삭제</button></span></div><div class="idea-entry-text">${esc(e.text)}</div></article>`).join(""):'<div class="idea-empty">아직 IDEA가 없습니다.</div>';}
+window.renderIdea=render;
+function resetForm(){editing=null;el("ideaDate").value=localDateString();el("ideaAI").checked=false;el("ideaText").value="";el("ideaCancel").style.display="none";status("내용을 입력하면 자동으로 저장됩니다.")}
+function edit(id){const e=entries().find(x=>x.id===id);if(!e)return;editing=id;el("ideaDate").value=e.date;el("ideaCategory").value=e.categoryId;el("ideaAI").checked=!!e.ai;el("ideaText").value=e.text;el("ideaCancel").style.display="inline-block";el("ideaText").focus();window.scrollTo({top:0,behavior:"smooth"})}
+async function autoSave(){if(saving)return;const text=el("ideaText").value.trim();if(!text){status("내용을 입력하면 자동으로 저장됩니다.");return}saving=true;const obj={date:el("ideaDate").value||localDateString(),categoryId:el("ideaCategory").value,ai:el("ideaAI").checked,text,updatedAt:Date.now()};if(editing){const i=entries().findIndex(e=>e.id===editing);if(i>=0)entries()[i]={...entries()[i],...obj};else editing=null}if(!editing){const id=uid();entries().push({id,createdAt:Date.now(),...obj});editing=id;el("ideaCancel").style.display="inline-block"}await saveAll();render();status("자동 저장됨");saving=false}
+function schedule(){clearTimeout(timer);timer=setTimeout(autoSave,450)}
+function showRandom(){if(!entries().length){alert("저장된 IDEA가 없습니다.");return}const e=entries()[Math.floor(Math.random()*entries().length)];el("ideaRandomBody").innerHTML=`<div class="idea-random-card"><div class="idea-random-meta">${esc(e.date)} · ${esc(catName(e.categoryId))}${e.ai?' · AI':''}</div><div class="idea-random-text">${esc(e.text)}</div><div class="idea-random-actions"><button class="idea-btn" id="ideaRandomAgain">다시 뽑기</button></div></div>`;el("ideaRandomModal").classList.remove("hidden");el("ideaRandomAgain").onclick=showRandom;}
+function renderCategorySettings(){const box=el("ideaCatList");if(!box)return;box.innerHTML="";cats().forEach((c,index)=>{const row=document.createElement("div");row.className="tag-preset-item";const input=document.createElement("input");input.value=c.name;const actions=document.createElement("div");actions.className="tag-preset-actions";const up=document.createElement("button");up.textContent="↑";const down=document.createElement("button");down.textContent="↓";const save=document.createElement("button");save.textContent="수정";const del=document.createElement("button");del.textContent="삭제";del.className="preset-delete";up.disabled=index===0;down.disabled=index===cats().length-1;up.onclick=async()=>{[cats()[index-1],cats()[index]]=[cats()[index],cats()[index-1]];await saveAll();renderCats();renderCategorySettings()};down.onclick=async()=>{[cats()[index+1],cats()[index]]=[cats()[index],cats()[index+1]];await saveAll();renderCats();renderCategorySettings()};save.onclick=async()=>{const n=input.value.trim();if(!n||cats().some(x=>x.id!==c.id&&x.name===n)){input.value=c.name;return}c.name=n;await saveAll();renderCats();render();renderCategorySettings()};del.onclick=async()=>{if(cats().length<=1)return;if(entries().some(x=>x.categoryId===c.id)){alert("이 분류를 사용하는 IDEA가 있습니다. 먼저 분류를 바꿔 주세요.");return}cats().splice(index,1);await saveAll();renderCats();renderCategorySettings()};actions.append(up,down,save,del);row.append(input,actions);box.appendChild(row)});}
+window.renderIdeaCategorySettings=renderCategorySettings;
+el("ideaAddCat").onclick=async()=>{const n=el("ideaNewCat").value.trim();if(!n||cats().some(c=>c.name===n))return;cats().push({id:uid(),name:n});el("ideaNewCat").value="";await saveAll();renderCats();renderCategorySettings()};
+el("ideaNewCat").addEventListener("keydown",e=>{if(e.key==="Enter")el("ideaAddCat").click()});
+el("ideaCancel").onclick=resetForm;el("ideaText").addEventListener("input",schedule);["ideaDate","ideaCategory","ideaAI"].forEach(id=>el(id).addEventListener("change",schedule));["ideaSearch","ideaFilterCat","ideaFilterAI","ideaSort"].forEach(id=>el(id).addEventListener(id==="ideaSearch"?"input":"change",render));
+el("ideaThisYear").checked=data.idea.settings.thisYear!==false;el("ideaThisYear").addEventListener("change",async()=>{data.idea.settings.thisYear=el("ideaThisYear").checked;await saveAll();render()});
+el("ideaList").onclick=async e=>{const d=e.target.closest("[data-del]");if(d){e.stopPropagation();if(confirm("이 IDEA를 삭제할까요?")){data.idea.entries=data.idea.entries.filter(x=>x.id!==d.dataset.del);await saveAll();if(editing===d.dataset.del)resetForm();render()}return}const ed=e.target.closest("[data-editbtn]")||e.target.closest("[data-edit]");if(ed)edit(ed.dataset.editbtn||ed.dataset.edit)};
+el("ideaRandomBtn").onclick=showRandom;el("ideaRandomClose").onclick=()=>el("ideaRandomModal").classList.add("hidden");el("ideaRandomModal").onclick=e=>{if(e.target===el("ideaRandomModal"))el("ideaRandomModal").classList.add("hidden")};
+el("ideaExport").onclick=()=>{const from=el("ideaExportFrom").value,to=el("ideaExportTo").value;if(!from||!to)return;if(from>to){alert("기간을 확인해주세요.");return}const a=[...entries()].filter(e=>e.date>=from&&e.date<=to).sort((x,y)=>String(x.date).localeCompare(String(y.date))||((x.createdAt||0)-(y.createdAt||0)));let md="",last="";for(const e of a){if(e.date!==last){if(md)md+="\n";md+=`### ${e.date}\n\n`;last=e.date}md+=`[${catName(e.categoryId)}] ${String(e.text).trim()}${e.ai?" (AI)":""}\n\n`}downloadText(`IDEA_${from}_${to}.md`,md.trimEnd()+"\n","text/markdown")};
+renderCats();resetForm();render();
 })();
 
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
