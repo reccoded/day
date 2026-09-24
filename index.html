@@ -920,6 +920,89 @@ button{cursor:pointer}
 }
 </style>
 
+
+<style id="idea-mobile-polish">
+@media (max-width:699px){
+  /* Top navigation: use the available phone width instead of clustering links */
+  .topbar{padding-left:8px;padding-right:8px;gap:6px}
+  .topbar .nav{
+    flex:1 1 auto;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:0;
+    min-width:0;
+  }
+  .topbar .nav button{
+    width:100%;
+    min-width:0;
+    padding-left:4px;
+    padding-right:4px;
+    text-align:center;
+  }
+
+  /* IDEA editor: date/category/AI controls share one visual height */
+  #ideaView .idea-editor-top{
+    align-items:stretch;
+  }
+  #ideaView .idea-editor-top input[type="date"],
+  #ideaView .idea-editor-top select,
+  #ideaView .idea-ai{
+    height:42px;
+    min-height:42px;
+    box-sizing:border-box;
+  }
+  #ideaView .idea-ai{
+    display:flex;
+    align-items:center;
+  }
+
+  /* IDEA filters: search + dice on first row, then two full-width 2-column rows */
+  #ideaView .idea-filter-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 42px;
+    gap:8px;
+    align-items:center;
+  }
+  #ideaView #ideaSearch{
+    grid-column:1;
+    grid-row:1;
+    width:100%;
+    min-width:0;
+  }
+  #ideaView #ideaRandomBtn{
+    grid-column:2;
+    grid-row:1;
+    width:42px;
+    min-width:42px;
+    height:42px;
+    margin:0;
+  }
+  #ideaView #ideaFilterCat{
+    grid-column:1;
+    grid-row:2;
+    width:100%;
+  }
+  #ideaView #ideaFilterAI{
+    grid-column:2;
+    grid-row:2;
+    width:100%;
+  }
+  #ideaView #ideaSort{
+    grid-column:1;
+    grid-row:3;
+    width:100%;
+  }
+  #ideaView .idea-year{
+    grid-column:2;
+    grid-row:3;
+    width:100%;
+    min-width:0;
+    justify-content:center;
+    box-sizing:border-box;
+  }
+}
+</style>
+
 </head>
 
 <body>
