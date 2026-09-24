@@ -745,6 +745,13 @@ button{cursor:pointer}
   #todoView .todo-add,#todoView .schedule-add{width:62%}
 }
 
+
+/* YEAR mobile month detail */
+.annual-mobile-detail-bg{display:none}
+@media(max-width:699px){
+.annual-month-card{cursor:pointer}.annual-mobile-detail-bg{position:fixed;inset:0;z-index:420;background:rgba(30,30,25,.28);display:flex;align-items:stretch;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}.annual-mobile-detail-bg.hidden{display:none!important}.annual-mobile-detail{width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}.annual-mobile-detail-head{flex:none;display:grid;grid-template-columns:44px minmax(0,1fr) 44px 44px;align-items:center;min-height:58px;padding:0 8px;border-bottom:1px solid var(--line);background:rgba(244,242,236,.97)}.annual-mobile-detail-head .arrow{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;font-size:28px}.annual-mobile-detail-title{text-align:center;font-size:19px;font-weight:750}.annual-mobile-detail-close{width:44px;height:44px;border:0;background:none;font-size:25px;color:var(--muted);border-radius:10px}.annual-mobile-detail-list{flex:1;overflow:auto;padding:12px 12px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}.annual-mobile-detail-item{margin-bottom:9px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 2px 8px rgba(45,45,38,.04);touch-action:pan-y}.annual-mobile-detail-item.dragging{opacity:.42}.annual-mobile-detail-item.drop-before{box-shadow:inset 0 3px 0 var(--accent)}.annual-mobile-detail-item.drop-after{box-shadow:inset 0 -3px 0 var(--accent)}.annual-mobile-detail-item-main{display:grid;grid-template-columns:minmax(0,1fr) 46px;align-items:stretch;min-height:64px}.annual-mobile-detail-edit{min-width:0;border:0;background:transparent;padding:11px 12px;text-align:left;color:inherit}.annual-mobile-detail-project{font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-label{margin-top:3px;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-meta{margin-top:5px;font-size:11px;font-weight:700;opacity:.82}.annual-mobile-detail-handle{width:46px;border:0;border-left:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.18);font-size:21px;font-weight:700;color:inherit;touch-action:none;cursor:grab}.annual-mobile-detail-empty{padding:48px 12px;text-align:center;color:var(--muted)}
+}
+
 /* SETTINGS */
 
 .modal-bg{
@@ -1113,10 +1120,12 @@ button{cursor:pointer}
 </div>
 
 
+
+<div id="annualMobileDetailModal" class="annual-mobile-detail-bg hidden"><div class="annual-mobile-detail"><div class="annual-mobile-detail-head"><button class="arrow" id="annualMobilePrevMonth" aria-label="이전 달">‹</button><div class="annual-mobile-detail-title" id="annualMobileDetailTitle"></div><button class="arrow" id="annualMobileNextMonth" aria-label="다음 달">›</button><button class="annual-mobile-detail-close" id="annualMobileDetailClose" aria-label="닫기">×</button></div><div class="annual-mobile-detail-list" id="annualMobileDetailList"></div></div></div>
+
 <div id="annualSettingsModal" class="dialog-bg hidden">
   <div class="dialog">
     <div class="modal-head"><h2>YEAR 표시 설정</h2><button class="icon-btn" id="annualSettingsClose">×</button></div>
-    <div class="small" style="margin-bottom:10px">체크한 제목만 YEAR에 표시됩니다.</div>
     <div id="annualSettingsList" class="annual-settings-list"></div>
   </div>
 </div>
@@ -2167,28 +2176,22 @@ function renderAnnualDesktop(segs){
 function renderAnnualMobile(segs){
   const box=document.getElementById('annualMobile');box.innerHTML='';const now=new Date();
   for(let m=0;m<12;m++){
-    const card=document.createElement('div');
-    card.className='annual-month-card'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');
+    const card=document.createElement('div');card.className='annual-month-card'+(now.getFullYear()===annualSelectedYear&&now.getMonth()===m?' current':'');
     const title=document.createElement('div');title.className='annual-month-title';title.textContent=(m+1)+'월';card.appendChild(title);
     const ms=`${annualSelectedYear}-${pad(m+1)}-01`,me=localDateString(new Date(annualSelectedYear,m+1,0,12));
-    segs.filter(s=>s.start<=me&&s.end>=ms).forEach(seg=>{
-      const item=document.createElement('div');item.className='annual-card-item';
-      const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);
-      const project=document.createElement('div');project.className='annual-card-project';
-      project.textContent=seg.project+(seg.label?' · '+seg.label:'');
-      const meta=document.createElement('div');meta.className='annual-card-meta';
-      const startsHere=seg.start>=ms&&seg.start<=me,endsHere=seg.end>=ms&&seg.end<=me;
-      const sd=Number(seg.start.slice(8)),ed=Number(seg.end.slice(8));
-      if(seg.start===seg.end) meta.textContent=`● ${sd}일`;
-      else if(startsHere&&endsHere) meta.textContent=`${sd}일–${ed}일`;
-      else if(startsHere) meta.textContent=`${sd}일 →`;
-      else if(endsHere) meta.textContent=`→ ${ed}일`;
-      else meta.textContent='→';
-      item.append(project,meta);item.onclick=()=>openAnnualModal(seg);card.appendChild(item);
-    });
-    box.appendChild(card);
+    segs.filter(s=>s.start<=me&&s.end>=ms).forEach(seg=>{const item=document.createElement('div');item.className='annual-card-item';const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);const project=document.createElement('div');project.className='annual-card-project';project.textContent=seg.project+(seg.label?' · '+seg.label:'');const meta=document.createElement('div');meta.className='annual-card-meta';meta.textContent=annualMonthMeta(seg,annualSelectedYear,m);item.append(project,meta);item.onclick=e=>{e.stopPropagation();openAnnualModal(seg)};card.appendChild(item)});
+    card.onclick=()=>openAnnualMobileDetail(m);box.appendChild(card);
   }
 }
+let annualMobileDetailMonth=0;
+function annualMonthSegments(year,month){const ms=`${year}-${pad(month+1)}-01`,me=localDateString(new Date(year,month+1,0,12));return annualSegments().filter(s=>annualProjectVisible(s.project)&&s.start<=me&&s.end>=ms)}
+function annualMonthMeta(seg,year,month){const ms=`${year}-${pad(month+1)}-01`,me=localDateString(new Date(year,month+1,0,12));const starts=seg.start>=ms&&seg.start<=me,ends=seg.end>=ms&&seg.end<=me,sd=Number(seg.start.slice(8)),ed=Number(seg.end.slice(8));if(seg.start===seg.end)return `● ${sd}일`;if(starts&&ends)return `${sd}일–${ed}일`;if(starts)return `${sd}일 →`;if(ends)return `→ ${ed}일`;return '→'}
+function openAnnualMobileDetail(month){if(!window.matchMedia('(max-width:699px)').matches)return;annualMobileDetailMonth=month;renderAnnualMobileDetail();document.getElementById('annualMobileDetailModal').classList.remove('hidden')}
+function closeAnnualMobileDetail(){document.getElementById('annualMobileDetailModal').classList.add('hidden')}
+function moveAnnualMobileDetailMonth(delta){let n=annualMobileDetailMonth+delta;if(n<0){annualSelectedYear--;n=11}else if(n>11){annualSelectedYear++;n=0}annualMobileDetailMonth=n;renderAnnual();renderAnnualMobileDetail()}
+function renderAnnualMobileDetail(){const title=document.getElementById('annualMobileDetailTitle'),list=document.getElementById('annualMobileDetailList');title.textContent=(annualMobileDetailMonth+1)+'월';list.innerHTML='';const segs=annualMonthSegments(annualSelectedYear,annualMobileDetailMonth),ps=new Set(segs.map(s=>s.project)),projects=orderedAnnualProjects(annualSegments()).filter(p=>ps.has(p)),ordered=[];projects.forEach(p=>segs.filter(s=>s.project===p).sort((a,b)=>a.start.localeCompare(b.start)).forEach(s=>ordered.push(s)));if(!ordered.length){list.innerHTML='<div class="annual-mobile-detail-empty">이 달에 기록된 구간이 없습니다.</div>';return}ordered.forEach(seg=>{const item=document.createElement('div');item.className='annual-mobile-detail-item';item.dataset.project=seg.project;const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);const main=document.createElement('div');main.className='annual-mobile-detail-item-main';const edit=document.createElement('button');edit.type='button';edit.className='annual-mobile-detail-edit';const project=document.createElement('div');project.className='annual-mobile-detail-project';project.textContent=seg.project;const label=document.createElement('div');label.className='annual-mobile-detail-label';label.textContent=seg.label||'';const meta=document.createElement('div');meta.className='annual-mobile-detail-meta';meta.textContent=annualMonthMeta(seg,annualSelectedYear,annualMobileDetailMonth);edit.append(project);if(seg.label)edit.append(label);edit.append(meta);edit.onclick=()=>openAnnualModal(seg);const handle=document.createElement('button');handle.type='button';handle.className='annual-mobile-detail-handle';handle.textContent='≡';handle.setAttribute('aria-label',seg.project+' 순서 변경');enableAnnualMobileProjectDrag(handle,item,seg.project,segs);main.append(edit,handle);item.appendChild(main);list.appendChild(item)})}
+function enableAnnualMobileProjectDrag(handle,item,project,segs){handle.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;e.preventDefault();try{handle.setPointerCapture(e.pointerId)}catch{}let dragging=false,target=null,after=false;const sx=e.clientX,sy=e.clientY;function clear(){document.querySelectorAll('#annualMobileDetailList .annual-mobile-detail-item').forEach(el=>el.classList.remove('drop-before','drop-after'))}function move(ev){if(!dragging&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>7){dragging=true;item.classList.add('dragging')}if(!dragging)return;ev.preventDefault();clear();const raw=document.elementFromPoint(ev.clientX,ev.clientY);target=raw?.closest('.annual-mobile-detail-item')||null;if(!target||target===item){target=null;return}const r=target.getBoundingClientRect();after=ev.clientY>r.top+r.height/2;target.classList.add(after?'drop-after':'drop-before')}async function up(){cleanup();clear();item.classList.remove('dragging');if(!dragging||!target)return;const tp=target.dataset.project;if(!tp||tp===project)return;await reorderAnnualProject(project,tp,after,segs);renderAnnualMobileDetail()}function cancel(){cleanup();clear();item.classList.remove('dragging')}function cleanup(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',cancel)}document.addEventListener('pointermove',move,{passive:false});document.addEventListener('pointerup',up,{once:true});document.addEventListener('pointercancel',cancel,{once:true})})}
+document.getElementById('annualMobilePrevMonth').onclick=()=>moveAnnualMobileDetailMonth(-1);document.getElementById('annualMobileNextMonth').onclick=()=>moveAnnualMobileDetailMonth(1);document.getElementById('annualMobileDetailClose').onclick=closeAnnualMobileDetail;
 function renderAnnualSettings(){
   const box=document.getElementById('annualSettingsList');box.innerHTML='';
   const projects=orderedAnnualProjects(annualSegments());
@@ -2219,7 +2222,7 @@ function openAnnualModal(seg=null){
   document.getElementById('annualStart').value=seg?.start||`${annualSelectedYear}-01-01`;document.getElementById('annualEnd').value=seg?.end||`${annualSelectedYear}-01-01`;
   document.getElementById('annualDelete').classList.toggle('hidden',!seg);document.getElementById('annualModal').classList.remove('hidden');
 }
-function closeAnnualModal(){document.getElementById('annualModal').classList.add('hidden');annualEditingId=null;}
+function closeAnnualModal(){document.getElementById('annualModal').classList.add('hidden');annualEditingId=null;if(!document.getElementById('annualMobileDetailModal').classList.contains('hidden'))renderAnnualMobileDetail();}
 document.getElementById('annualAdd').onclick=()=>openAnnualModal();document.getElementById('annualClose').onclick=closeAnnualModal;document.getElementById('annualCancel').onclick=closeAnnualModal;document.getElementById('annualModal').onclick=e=>{if(e.target.id==='annualModal')closeAnnualModal()};
 document.getElementById('annualProject').addEventListener('change',e=>{const p=e.target.value.trim();if(p)document.getElementById('annualColor').value=projectColor(p)});
 document.getElementById('annualPrevYear').onclick=()=>{annualSelectedYear--;renderAnnual()};document.getElementById('annualNextYear').onclick=()=>{annualSelectedYear++;renderAnnual()};
