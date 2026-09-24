@@ -749,7 +749,7 @@ button{cursor:pointer}
 /* YEAR mobile month detail */
 .annual-mobile-detail-bg{display:none}
 @media(max-width:699px){
-.annual-month-card{cursor:pointer}.annual-mobile-detail-bg{position:fixed;inset:0;z-index:420;background:rgba(30,30,25,.28);display:flex;align-items:stretch;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}.annual-mobile-detail-bg.hidden{display:none!important}.annual-mobile-detail{width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}.annual-mobile-detail-head{flex:none;display:grid;grid-template-columns:44px minmax(0,1fr) 44px 44px;align-items:center;min-height:58px;padding:0 8px;border-bottom:1px solid var(--line);background:rgba(244,242,236,.97)}.annual-mobile-detail-head .arrow{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;font-size:28px}.annual-mobile-detail-title{text-align:center;font-size:19px;font-weight:750}.annual-mobile-detail-close{width:44px;height:44px;border:0;background:none;font-size:25px;color:var(--muted);border-radius:10px}.annual-mobile-detail-list{flex:1;overflow:auto;padding:12px 12px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}.annual-mobile-detail-item{margin-bottom:9px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 2px 8px rgba(45,45,38,.04);touch-action:pan-y}.annual-mobile-detail-item.dragging{opacity:.42}.annual-mobile-detail-item.drop-before{box-shadow:inset 0 3px 0 var(--accent)}.annual-mobile-detail-item.drop-after{box-shadow:inset 0 -3px 0 var(--accent)}.annual-mobile-detail-item-main{display:grid;grid-template-columns:minmax(0,1fr) 46px;align-items:stretch;min-height:64px}.annual-mobile-detail-edit{min-width:0;border:0;background:transparent;padding:11px 12px;text-align:left;color:inherit}.annual-mobile-detail-project{font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-label{margin-top:3px;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-meta{margin-top:5px;font-size:11px;font-weight:700;opacity:.82}.annual-mobile-detail-handle{width:46px;border:0;border-left:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.18);font-size:21px;font-weight:700;color:inherit;touch-action:none;cursor:grab}.annual-mobile-detail-empty{padding:48px 12px;text-align:center;color:var(--muted)}
+.annual-month-card{cursor:pointer}.annual-mobile-detail-bg{position:fixed;inset:0;z-index:420;background:rgba(30,30,25,.28);display:flex;align-items:stretch;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}.annual-mobile-detail-bg.hidden{display:none!important}.annual-mobile-detail{width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}.annual-mobile-detail-head{flex:none;display:grid;grid-template-columns:44px minmax(0,1fr) 44px 44px;align-items:center;min-height:58px;padding:0 8px;border-bottom:1px solid var(--line);background:rgba(244,242,236,.97)}.annual-mobile-detail-head .arrow{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;font-size:28px}.annual-mobile-detail-title{text-align:center;font-size:19px;font-weight:750}.annual-mobile-detail-close{width:44px;height:44px;border:0;background:none;font-size:25px;color:var(--muted);border-radius:10px}.annual-mobile-detail-list{flex:1;overflow:auto;padding:12px 12px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}.annual-mobile-detail-item{margin-bottom:9px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 2px 8px rgba(45,45,38,.04);touch-action:pan-y}.annual-mobile-detail-item.dragging{opacity:.42}.annual-mobile-detail-item.drop-before{box-shadow:inset 0 3px 0 var(--accent)}.annual-mobile-detail-item.drop-after{box-shadow:inset 0 -3px 0 var(--accent)}.annual-mobile-detail-item-main{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:stretch;min-height:64px}.annual-mobile-detail-edit{min-width:0;border:0;background:transparent;padding:11px 12px;text-align:left;color:inherit}.annual-mobile-detail-project{font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-label{margin-top:3px;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.annual-mobile-detail-meta{margin-top:5px;font-size:11px;font-weight:700;opacity:.82}.annual-mobile-detail-order{display:grid;grid-template-rows:1fr 1fr;border-left:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.10)}.annual-mobile-detail-order button{width:44px;min-height:32px;border:0;background:rgba(255,255,255,.16);color:inherit;font-size:17px;font-weight:800;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}.annual-mobile-detail-order button+button{border-top:1px solid rgba(0,0,0,.08)}.annual-mobile-detail-order button:active:not(:disabled){background:rgba(255,255,255,.30)}.annual-mobile-detail-order button:disabled{opacity:.24}.annual-mobile-detail-empty{padding:48px 12px;text-align:center;color:var(--muted)}
 }
 
 /* SETTINGS */
@@ -2189,62 +2189,8 @@ function annualMonthMeta(seg,year,month){const ms=`${year}-${pad(month+1)}-01`,m
 function openAnnualMobileDetail(month){if(!window.matchMedia('(max-width:699px)').matches)return;annualMobileDetailMonth=month;renderAnnualMobileDetail();document.getElementById('annualMobileDetailModal').classList.remove('hidden')}
 function closeAnnualMobileDetail(){document.getElementById('annualMobileDetailModal').classList.add('hidden')}
 function moveAnnualMobileDetailMonth(delta){let n=annualMobileDetailMonth+delta;if(n<0){annualSelectedYear--;n=11}else if(n>11){annualSelectedYear++;n=0}annualMobileDetailMonth=n;renderAnnual();renderAnnualMobileDetail()}
-function renderAnnualMobileDetail(){const title=document.getElementById('annualMobileDetailTitle'),list=document.getElementById('annualMobileDetailList');title.textContent=(annualMobileDetailMonth+1)+'월';list.innerHTML='';const segs=annualMonthSegments(annualSelectedYear,annualMobileDetailMonth),ps=new Set(segs.map(s=>s.project)),projects=orderedAnnualProjects(annualSegments()).filter(p=>ps.has(p)),ordered=[];projects.forEach(p=>segs.filter(s=>s.project===p).sort((a,b)=>a.start.localeCompare(b.start)).forEach(s=>ordered.push(s)));if(!ordered.length){list.innerHTML='<div class="annual-mobile-detail-empty">이 달에 기록된 구간이 없습니다.</div>';return}ordered.forEach(seg=>{const item=document.createElement('div');item.className='annual-mobile-detail-item';item.dataset.project=seg.project;const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);const main=document.createElement('div');main.className='annual-mobile-detail-item-main';const edit=document.createElement('button');edit.type='button';edit.className='annual-mobile-detail-edit';const project=document.createElement('div');project.className='annual-mobile-detail-project';project.textContent=seg.project;const label=document.createElement('div');label.className='annual-mobile-detail-label';label.textContent=seg.label||'';const meta=document.createElement('div');meta.className='annual-mobile-detail-meta';meta.textContent=annualMonthMeta(seg,annualSelectedYear,annualMobileDetailMonth);edit.append(project);if(seg.label)edit.append(label);edit.append(meta);edit.onclick=()=>openAnnualModal(seg);const handle=document.createElement('button');handle.type='button';handle.className='annual-mobile-detail-handle';handle.textContent='≡';handle.setAttribute('aria-label',seg.project+' 순서 변경');enableAnnualMobileProjectDrag(handle,item,seg.project,segs);main.append(edit,handle);item.appendChild(main);list.appendChild(item)})}
-function enableAnnualMobileProjectDrag(handle,item,project,segs){
-  handle.addEventListener('pointerdown',e=>{
-    if(e.pointerType==='mouse')return;
-    e.preventDefault();
-    const sx=e.clientX,sy=e.clientY;
-    let dragging=false,target=null,after=false;
-
-    const rows=()=>[...document.querySelectorAll('#annualMobileDetailList .annual-mobile-detail-item')];
-    const clear=()=>rows().forEach(el=>el.classList.remove('drop-before','drop-after'));
-    function hitAt(y){
-      const candidates=rows().filter(el=>el!==item);
-      if(!candidates.length)return null;
-      for(const el of candidates){
-        const r=el.getBoundingClientRect();
-        if(y>=r.top&&y<=r.bottom)return {el,after:y>r.top+r.height/2};
-      }
-      let best=null,dist=Infinity;
-      candidates.forEach(el=>{
-        const r=el.getBoundingClientRect(),mid=r.top+r.height/2,d=Math.abs(y-mid);
-        if(d<dist){dist=d;best={el,after:y>mid};}
-      });
-      return best;
-    }
-    function move(ev){
-      if(!dragging&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>7){
-        dragging=true;item.classList.add('dragging');
-      }
-      if(!dragging)return;
-      ev.preventDefault();clear();
-      const hit=hitAt(ev.clientY);
-      target=hit?.el||null;after=!!hit?.after;
-      if(target)target.classList.add(after?'drop-after':'drop-before');
-    }
-    async function up(ev){
-      cleanup();clear();item.classList.remove('dragging');
-      if(!dragging)return;
-      const hit=hitAt(ev.clientY);
-      if(hit){target=hit.el;after=hit.after;}
-      if(!target)return;
-      const tp=target.dataset.project;
-      if(!tp||tp===project)return;
-      await reorderAnnualProject(project,tp,after,segs);
-      renderAnnualMobileDetail();
-    }
-    function cancel(){cleanup();clear();item.classList.remove('dragging');}
-    function cleanup(){
-      document.removeEventListener('pointermove',move);
-      document.removeEventListener('pointerup',up);
-      document.removeEventListener('pointercancel',cancel);
-    }
-    document.addEventListener('pointermove',move,{passive:false});
-    document.addEventListener('pointerup',up,{once:true});
-    document.addEventListener('pointercancel',cancel,{once:true});
-  },{passive:false});
-}
+function renderAnnualMobileDetail(){const title=document.getElementById('annualMobileDetailTitle'),list=document.getElementById('annualMobileDetailList');title.textContent=(annualMobileDetailMonth+1)+'월';list.innerHTML='';const segs=annualMonthSegments(annualSelectedYear,annualMobileDetailMonth),ps=new Set(segs.map(s=>s.project)),projects=orderedAnnualProjects(annualSegments()).filter(p=>ps.has(p)),ordered=[];projects.forEach(p=>segs.filter(s=>s.project===p).sort((a,b)=>a.start.localeCompare(b.start)).forEach(s=>ordered.push(s)));if(!ordered.length){list.innerHTML='<div class="annual-mobile-detail-empty">이 달에 기록된 구간이 없습니다.</div>';return}ordered.forEach(seg=>{const item=document.createElement('div');item.className='annual-mobile-detail-item';item.dataset.project=seg.project;const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);const main=document.createElement('div');main.className='annual-mobile-detail-item-main';const edit=document.createElement('button');edit.type='button';edit.className='annual-mobile-detail-edit';const project=document.createElement('div');project.className='annual-mobile-detail-project';project.textContent=seg.project;const label=document.createElement('div');label.className='annual-mobile-detail-label';label.textContent=seg.label||'';const meta=document.createElement('div');meta.className='annual-mobile-detail-meta';meta.textContent=annualMonthMeta(seg,annualSelectedYear,annualMobileDetailMonth);edit.append(project);if(seg.label)edit.append(label);edit.append(meta);edit.onclick=()=>openAnnualModal(seg);const order=document.createElement('div');order.className='annual-mobile-detail-order';const up=document.createElement('button');up.type='button';up.textContent='↑';up.setAttribute('aria-label',seg.project+' 위로 이동');const down=document.createElement('button');down.type='button';down.textContent='↓';down.setAttribute('aria-label',seg.project+' 아래로 이동');const pi=projects.indexOf(seg.project);up.disabled=pi<=0;down.disabled=pi<0||pi>=projects.length-1;up.onclick=async e=>{e.stopPropagation();await moveAnnualMobileProject(seg.project,-1,segs)};down.onclick=async e=>{e.stopPropagation();await moveAnnualMobileProject(seg.project,1,segs)};order.append(up,down);main.append(edit,order);item.appendChild(main);list.appendChild(item)})}
+async function moveAnnualMobileProject(project,direction,segs){const ps=new Set(segs.map(s=>s.project)),projects=orderedAnnualProjects(annualSegments()).filter(p=>ps.has(p)),from=projects.indexOf(project),to=from+direction;if(from<0||to<0||to>=projects.length)return;const target=projects[to];await reorderAnnualProject(project,target,direction>0,segs);renderAnnualMobileDetail()}
 document.getElementById('annualMobilePrevMonth').onclick=()=>moveAnnualMobileDetailMonth(-1);document.getElementById('annualMobileNextMonth').onclick=()=>moveAnnualMobileDetailMonth(1);document.getElementById('annualMobileDetailClose').onclick=closeAnnualMobileDetail;
 function renderAnnualSettings(){
   const box=document.getElementById('annualSettingsList');box.innerHTML='';
