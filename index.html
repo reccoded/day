@@ -1096,7 +1096,7 @@ button{cursor:pointer}
         <input id="tagPresetInput" placeholder="새 태그">
         <button class="primary-btn" id="tagPresetAdd">추가</button>
       </div>
-      <div class="small" style="margin-top:8px">드래그해서 순서를 바꿀 수 있습니다. 모바일에서는 ↑ ↓ 버튼을 사용하세요.</div>
+      
     </div>
 
     <div class="settings-card">
@@ -2190,7 +2190,61 @@ function openAnnualMobileDetail(month){if(!window.matchMedia('(max-width:699px)'
 function closeAnnualMobileDetail(){document.getElementById('annualMobileDetailModal').classList.add('hidden')}
 function moveAnnualMobileDetailMonth(delta){let n=annualMobileDetailMonth+delta;if(n<0){annualSelectedYear--;n=11}else if(n>11){annualSelectedYear++;n=0}annualMobileDetailMonth=n;renderAnnual();renderAnnualMobileDetail()}
 function renderAnnualMobileDetail(){const title=document.getElementById('annualMobileDetailTitle'),list=document.getElementById('annualMobileDetailList');title.textContent=(annualMobileDetailMonth+1)+'월';list.innerHTML='';const segs=annualMonthSegments(annualSelectedYear,annualMobileDetailMonth),ps=new Set(segs.map(s=>s.project)),projects=orderedAnnualProjects(annualSegments()).filter(p=>ps.has(p)),ordered=[];projects.forEach(p=>segs.filter(s=>s.project===p).sort((a,b)=>a.start.localeCompare(b.start)).forEach(s=>ordered.push(s)));if(!ordered.length){list.innerHTML='<div class="annual-mobile-detail-empty">이 달에 기록된 구간이 없습니다.</div>';return}ordered.forEach(seg=>{const item=document.createElement('div');item.className='annual-mobile-detail-item';item.dataset.project=seg.project;const color=projectColor(seg.project);item.style.background=color;item.style.color=annualInk(color);const main=document.createElement('div');main.className='annual-mobile-detail-item-main';const edit=document.createElement('button');edit.type='button';edit.className='annual-mobile-detail-edit';const project=document.createElement('div');project.className='annual-mobile-detail-project';project.textContent=seg.project;const label=document.createElement('div');label.className='annual-mobile-detail-label';label.textContent=seg.label||'';const meta=document.createElement('div');meta.className='annual-mobile-detail-meta';meta.textContent=annualMonthMeta(seg,annualSelectedYear,annualMobileDetailMonth);edit.append(project);if(seg.label)edit.append(label);edit.append(meta);edit.onclick=()=>openAnnualModal(seg);const handle=document.createElement('button');handle.type='button';handle.className='annual-mobile-detail-handle';handle.textContent='≡';handle.setAttribute('aria-label',seg.project+' 순서 변경');enableAnnualMobileProjectDrag(handle,item,seg.project,segs);main.append(edit,handle);item.appendChild(main);list.appendChild(item)})}
-function enableAnnualMobileProjectDrag(handle,item,project,segs){handle.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;e.preventDefault();try{handle.setPointerCapture(e.pointerId)}catch{}let dragging=false,target=null,after=false;const sx=e.clientX,sy=e.clientY;function clear(){document.querySelectorAll('#annualMobileDetailList .annual-mobile-detail-item').forEach(el=>el.classList.remove('drop-before','drop-after'))}function move(ev){if(!dragging&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>7){dragging=true;item.classList.add('dragging')}if(!dragging)return;ev.preventDefault();clear();const raw=document.elementFromPoint(ev.clientX,ev.clientY);target=raw?.closest('.annual-mobile-detail-item')||null;if(!target||target===item){target=null;return}const r=target.getBoundingClientRect();after=ev.clientY>r.top+r.height/2;target.classList.add(after?'drop-after':'drop-before')}async function up(){cleanup();clear();item.classList.remove('dragging');if(!dragging||!target)return;const tp=target.dataset.project;if(!tp||tp===project)return;await reorderAnnualProject(project,tp,after,segs);renderAnnualMobileDetail()}function cancel(){cleanup();clear();item.classList.remove('dragging')}function cleanup(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',cancel)}document.addEventListener('pointermove',move,{passive:false});document.addEventListener('pointerup',up,{once:true});document.addEventListener('pointercancel',cancel,{once:true})})}
+function enableAnnualMobileProjectDrag(handle,item,project,segs){
+  handle.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse')return;
+    e.preventDefault();
+    const sx=e.clientX,sy=e.clientY;
+    let dragging=false,target=null,after=false;
+
+    const rows=()=>[...document.querySelectorAll('#annualMobileDetailList .annual-mobile-detail-item')];
+    const clear=()=>rows().forEach(el=>el.classList.remove('drop-before','drop-after'));
+    function hitAt(y){
+      const candidates=rows().filter(el=>el!==item);
+      if(!candidates.length)return null;
+      for(const el of candidates){
+        const r=el.getBoundingClientRect();
+        if(y>=r.top&&y<=r.bottom)return {el,after:y>r.top+r.height/2};
+      }
+      let best=null,dist=Infinity;
+      candidates.forEach(el=>{
+        const r=el.getBoundingClientRect(),mid=r.top+r.height/2,d=Math.abs(y-mid);
+        if(d<dist){dist=d;best={el,after:y>mid};}
+      });
+      return best;
+    }
+    function move(ev){
+      if(!dragging&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>7){
+        dragging=true;item.classList.add('dragging');
+      }
+      if(!dragging)return;
+      ev.preventDefault();clear();
+      const hit=hitAt(ev.clientY);
+      target=hit?.el||null;after=!!hit?.after;
+      if(target)target.classList.add(after?'drop-after':'drop-before');
+    }
+    async function up(ev){
+      cleanup();clear();item.classList.remove('dragging');
+      if(!dragging)return;
+      const hit=hitAt(ev.clientY);
+      if(hit){target=hit.el;after=hit.after;}
+      if(!target)return;
+      const tp=target.dataset.project;
+      if(!tp||tp===project)return;
+      await reorderAnnualProject(project,tp,after,segs);
+      renderAnnualMobileDetail();
+    }
+    function cancel(){cleanup();clear();item.classList.remove('dragging');}
+    function cleanup(){
+      document.removeEventListener('pointermove',move);
+      document.removeEventListener('pointerup',up);
+      document.removeEventListener('pointercancel',cancel);
+    }
+    document.addEventListener('pointermove',move,{passive:false});
+    document.addEventListener('pointerup',up,{once:true});
+    document.addEventListener('pointercancel',cancel,{once:true});
+  },{passive:false});
+}
 document.getElementById('annualMobilePrevMonth').onclick=()=>moveAnnualMobileDetailMonth(-1);document.getElementById('annualMobileNextMonth').onclick=()=>moveAnnualMobileDetailMonth(1);document.getElementById('annualMobileDetailClose').onclick=closeAnnualMobileDetail;
 function renderAnnualSettings(){
   const box=document.getElementById('annualSettingsList');box.innerHTML='';
@@ -2219,7 +2273,7 @@ function openAnnualModal(seg=null){
   annualEditingId=seg?.id||null;document.getElementById('annualModalTitle').textContent=seg?'구간 수정':'구간 추가';
   document.getElementById('annualProject').value=seg?.project||'';document.getElementById('annualLabel').value=seg?.label||'';
   document.getElementById('annualColor').value=projectColor(seg?.project||'새 프로젝트');
-  document.getElementById('annualStart').value=seg?.start||`${annualSelectedYear}-01-01`;document.getElementById('annualEnd').value=seg?.end||`${annualSelectedYear}-01-01`;
+  const annualDefaultDate=localDateString();document.getElementById('annualStart').value=seg?.start||annualDefaultDate;document.getElementById('annualEnd').value=seg?.end||annualDefaultDate;
   document.getElementById('annualDelete').classList.toggle('hidden',!seg);document.getElementById('annualModal').classList.remove('hidden');
 }
 function closeAnnualModal(){document.getElementById('annualModal').classList.add('hidden');annualEditingId=null;if(!document.getElementById('annualMobileDetailModal').classList.contains('hidden'))renderAnnualMobileDetail();}
