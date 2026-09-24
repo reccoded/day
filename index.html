@@ -940,38 +940,39 @@ button{cursor:pointer}
     text-align:center;
   }
 
-  /* IDEA editor: date/category/AI controls share one visual height */
-  #ideaView .idea-editor-top{
-    align-items:stretch;
-  }
-  #ideaView .idea-editor-top input[type="date"],
-  #ideaView .idea-editor-top select,
-  #ideaView .idea-ai{
-    height:42px;
-    min-height:42px;
+  /* IDEA editor: date/category/AI controls share one compact visual height */
+  #ideaView .idea-meta{align-items:end}
+  #ideaView .idea-meta .idea-field input[type="date"],
+  #ideaView .idea-meta .idea-field select,
+  #ideaView .idea-meta .idea-ai{
+    height:40px;
+    min-height:40px;
     box-sizing:border-box;
   }
-  #ideaView .idea-ai{
-    display:flex;
+  #ideaView .idea-meta .idea-ai{
+    display:flex!important;
     align-items:center;
   }
 
-  /* IDEA filters: search + dice on first row, then two full-width 2-column rows */
+  /* IDEA filters: keep search + dice, then exact 50:50 pairs below */
   #ideaView .idea-filter-row{
+    position:relative;
     display:grid;
-    grid-template-columns:minmax(0,1fr) 42px;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:8px;
     align-items:center;
   }
   #ideaView #ideaSearch{
-    grid-column:1;
+    grid-column:1 / 3;
     grid-row:1;
-    width:100%;
+    width:calc(100% - 50px);
     min-width:0;
+    justify-self:start;
   }
   #ideaView #ideaRandomBtn{
-    grid-column:2;
-    grid-row:1;
+    position:absolute;
+    top:0;
+    right:0;
     width:42px;
     min-width:42px;
     height:42px;
@@ -981,16 +982,19 @@ button{cursor:pointer}
     grid-column:1;
     grid-row:2;
     width:100%;
+    min-width:0;
   }
   #ideaView #ideaFilterAI{
     grid-column:2;
     grid-row:2;
     width:100%;
+    min-width:0;
   }
   #ideaView #ideaSort{
     grid-column:1;
     grid-row:3;
     width:100%;
+    min-width:0;
   }
   #ideaView .idea-year{
     grid-column:2;
