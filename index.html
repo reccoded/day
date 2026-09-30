@@ -1935,11 +1935,7 @@ function recentDiaryEntries(){
   const yearPrefix=String(new Date().getFullYear())+"-";
   return Object.entries(data.diaries||{})
     .filter(([date,e])=>date?.startsWith(yearPrefix)&&e&&((e.title||"").trim()||(e.text||"").trim()||(e.tags||[]).length))
-    .sort((a,b)=>{
-      const au=Number(a[1]?.updatedAt)||0, bu=Number(b[1]?.updatedAt)||0;
-      if(au!==bu)return bu-au;
-      return b[0].localeCompare(a[0]);
-    })
+    .sort((a,b)=>b[0].localeCompare(a[0]))
     .slice(0,63);
 }
 function renderDiaryGrid(){
@@ -2882,7 +2878,7 @@ function startTodoTitleEdit(item,list,titleEl){
 function makeTodoItem(item,list,index){
   const el=document.createElement("div");
   el.className="todo-item";
-  el.draggable=window.matchMedia('(pointer:fine)').matches;
+  el.draggable=false;
   el.dataset.id=item.id;
   el.dataset.list=list;
 
@@ -2906,6 +2902,7 @@ function makeTodoItem(item,list,index){
   const handle=document.createElement("div");
   handle.className="drag-handle";
   handle.textContent="≡";
+  handle.draggable=true;
   handle.oncontextmenu=e=>e.preventDefault();
 
   const del=document.createElement("button");
@@ -2913,7 +2910,9 @@ function makeTodoItem(item,list,index){
   del.textContent="×";
   del.onclick=()=>deleteTodoItem(list,item.id);
 
-  el.addEventListener("dragstart",e=>{
+  handle.addEventListener("dragstart",e=>{
+    e.stopPropagation();
+    e.dataTransfer.effectAllowed="move";
     e.dataTransfer.setData("text/plain",
       JSON.stringify({
         kind:"todo",
